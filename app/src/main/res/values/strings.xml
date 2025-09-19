@@ -12,4 +12,14 @@
     <string name="btn_secondary">Más info</string>
     <string name="sample_title">Título de sección</string>
     <string name="sample_body">Este es un texto de ejemplo para previsualizar el contenido dentro de una tarjeta reutilizable.</string>
+
+    <!-- Home -->
+    <string name="home_header_title">BAMX Puebla</string>
+    <string name="home_subtitle">Aprende y juega con Nutri</string>
+    <string name="home_btn_start">Comenzar</string>
+    <string name="home_btn_parents">Padres</string>
+
+    <!-- A11y -->
+    <string name="cd_logo_bamx">Logo de BAMX Puebla</string>
+    <string name="cd_home_illustration">Ilustración temática de alimentación saludable</string>
 </resources>
