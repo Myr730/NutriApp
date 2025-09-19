@@ -2,4 +2,9 @@
 <resources>
     <string name="app_name">BAMX Puebla</string>
     <string name="hello_preview">¡Hola, Compose!</string>
+
+    <!-- Pantallas -->
+    <string name="home_title">Pantalla inicial</string>
+    <string name="parents_title">Pantalla de padres</string>
+    <string name="game_title">Pantalla del juego</string>
 </resources>
