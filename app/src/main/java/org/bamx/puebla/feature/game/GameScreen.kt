@@ -9,19 +9,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
+import org.bamx.puebla.ui.components.AppScaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun GameScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimens.screenPadding)
+    AppScaffold(
+        backgroundResId =  R.drawable.bg_game ,
+        darkenBackground = 0.18f // un poco más oscuro para tablero
     ) {
-        Text(text = stringResource(id = R.string.game_title))
-        Spacer(Modifier.height(Dimens.space16))
-        Text(text = "Placeholder: área de tablero + panel lateral (estático).")
+        Text(
+            text = stringResource(id = R.string.game_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        // Tablero + panel lateral (Bloque 9)
     }
 }
+
 
 @Preview(
     name = "Game - 411x891 Light",

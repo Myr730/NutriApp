@@ -9,17 +9,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
+import org.bamx.puebla.ui.components.AppScaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun ParentsScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimens.screenPadding)
+    AppScaffold(
+        backgroundResId = R.drawable.bg_parents,
+        darkenBackground = 0.12f
     ) {
-        Text(text = stringResource(id = R.string.parents_title))
-        Spacer(Modifier.height(Dimens.space16))
-        Text(text = "Placeholder de tarjetas (Información, Ajustes, Ayuda).")
+        Text(
+            text = stringResource(id = R.string.parents_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        // Tarjetas y placeholders (Bloque 8)
     }
 }
 

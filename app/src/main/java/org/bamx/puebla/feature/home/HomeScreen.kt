@@ -1,5 +1,9 @@
 package org.bamx.puebla.feature.home
 
+import org.bamx.puebla.ui.components.AppScaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,14 +16,16 @@ import org.bamx.puebla.ui.theme.Dimens
 
 @Composable
 fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimens.screenPadding)
+    AppScaffold(
+        // Cambia a R.drawable.bg_home cuando el asset esté listo:
+        backgroundResId = R.drawable.bg_home,
+        darkenBackground = 0.12f // leve scrim para contraste
     ) {
-        Text(text = stringResource(id = R.string.home_title))
-        Spacer(Modifier.height(Dimens.space16))
-        Text(text = "Placeholder de layout (header/logo, botones, ilustración).")
+        Text(
+            text = stringResource(id = R.string.home_title),
+            style = MaterialTheme.typography.headlineMedium
+        )
+        // Aquí seguirá la maquetación (Bloque 7)
     }
 }
 
