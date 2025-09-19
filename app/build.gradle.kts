@@ -58,21 +58,31 @@ android {
     }
 }
 
+// BAMXPuebla/app/build.gradle.kts
 dependencies {
-    // *** Las dependencias definitivas de Compose/Material3 las fijaremos en el Bloque 2 con BOM. ***
-    // Por ahora, mantenemos las que generó la plantilla (si las hubiera). Si el módulo está vacío, puedes temporalmente:
+    // --- Core Android/Kotlin ---
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-compose:1.9.2")
 
-    // Tooling básico para previews (se afinará en Bloque 2)
-    implementation("androidx.compose.ui:ui:1.7.1")
-    implementation("androidx.compose.material3:material3:1.3.0")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.1")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.1")
+    // --- Jetpack Compose (alineado con BOM) ---
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.01")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
+    // Módulos gestionados por el BOM (sin versión explícita)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // Tooling solo en debug
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Tests
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }
+

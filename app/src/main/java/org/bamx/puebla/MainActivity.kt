@@ -22,15 +22,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// BAMXPuebla/app/src/main/java/org/bamx/puebla/MainActivity.kt
 @Composable
 fun HelloPreviewText() {
-    Text(text = stringResource(id = R.string.hello_preview))
+    // Usamos Material3 desde el BOM
+    androidx.compose.material3.Text(text = stringResource(id = R.string.hello_preview))
 }
 
-@Preview(showBackground = true, name = "Hello Preview")
+@Preview(showBackground = true, name = "Material3 Preview - Light")
 @Composable
-private fun HelloPreview() {
-    Surface {
+private fun HelloPreviewLight() {
+    androidx.compose.material3.Surface {
+        HelloPreviewText()
+    }
+}
+
+@Preview(
+    showBackground = true,
+    name = "Material3 Preview - Dark",
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun HelloPreviewDark() {
+    androidx.compose.material3.Surface {
         HelloPreviewText()
     }
 }
