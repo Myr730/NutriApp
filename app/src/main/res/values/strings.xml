@@ -17,9 +17,20 @@
     <string name="home_header_title">BAMX Puebla</string>
     <string name="home_subtitle">Aprende y juega con Nutri</string>
     <string name="home_btn_start">Comenzar</string>
-    <string name="home_btn_parents">Padres</string>
+
+    <!-- A11y -->
+    <string name="cd_home_illustration">Ilustración temática de alimentación saludable</string>
+    <string name="home_btn_play">JUGAR</string>
+    <string name="home_btn_parents">PADRES</string>
+    <string name="home_btn_settings">AJUSTES</string>
 
     <!-- A11y -->
     <string name="cd_logo_bamx">Logo de BAMX Puebla</string>
-    <string name="cd_home_illustration">Ilustración temática de alimentación saludable</string>
+    <string name="cd_title_aventuras">Título Aventuras con Nutri</string>
+    <string name="cd_mascot_nutri">Nutri saludando</string>
+    <string name="brand_bamx">BAMX</string>
+    <string name="brand_puebla">Puebla</string>
+
+
+
 </resources>

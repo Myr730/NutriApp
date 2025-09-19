@@ -2,145 +2,121 @@ package org.bamx.puebla.feature.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.components.AppScaffold
-import org.bamx.puebla.ui.components.PrimaryButton
-import org.bamx.puebla.ui.components.SecondaryButton
+import org.bamx.puebla.ui.components.ParentsButton
+import org.bamx.puebla.ui.components.PlayButton
+import org.bamx.puebla.ui.components.SettingsButton
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
 
 @Composable
 fun HomeScreen() {
-    // Si ya subiste el fondo, cambia null -> R.drawable.bg_home
     AppScaffold(
         backgroundResId = R.drawable.bg_home,
-        darkenBackground = 0.12f
+        darkenBackground = 0f
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Header con logo (opcional) + títulos
-            HeaderHome(
-                // Si ya subiste el logo, cambia null -> R.drawable.logo_bamx
-                logoRes = R.drawable.logo_bamx
-            )
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+        // Nutri más grande (sin límites): subimos las fracciones
+        val fracSmall = 0.75f   // teléfonos pequeños (≤360dp)
+        val fracNormal = 0.85f  // teléfonos “normales” (>360dp)
+        val mascotWidth = if (screenWidth <= 360.dp)
+            (screenWidth.value * fracSmall).dp
+        else
+            (screenWidth.value * fracNormal).dp
 
-            // Área ilustrativa central (opcional)
-            IllustrationHome(
-                // Si ya subiste la ilustración, cambia null -> R.drawable.home_illustration
-                illustrationRes = R.drawable.home_illustration
-            )
+        Box(Modifier.fillMaxSize()) {
 
-            // Botones de acción (sin navegación real)
-            ActionsHome()
-        }
-    }
-}
-
-@Composable
-private fun HeaderHome(logoRes: Int?) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (logoRes != null) {
-            Image(
-                painter = painterResource(id = logoRes),
-                contentDescription = stringResource(id = R.string.cd_logo_bamx),
-                modifier = Modifier.size(72.dp),
-                contentScale = ContentScale.Fit
-            )
-            Spacer(Modifier.height(Dimens.space8))
-        }
-
-        // Título como encabezado semántico
-        Text(
-            text = stringResource(id = R.string.home_header_title),
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.semantics { heading() }
-        )
-
-        Spacer(Modifier.height(Dimens.space8))
-
-        Text(
-            text = stringResource(id = R.string.home_subtitle),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
-        )
-    }
-}
-
-@Composable
-private fun IllustrationHome(illustrationRes: Int?) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (illustrationRes != null) {
-            Image(
-                painter = painterResource(id = illustrationRes),
-                contentDescription = stringResource(id = R.string.cd_home_illustration),
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Fit
-            )
-        } else {
-            // Placeholder visible en previews si aún no hay asset
-            Surface(
-                tonalElevation = 2.dp,
-                shadowElevation = 2.dp
+            // 1) Logo + “BAMX Puebla” (arriba-izquierda)
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = Dimens.space16, start = Dimens.space16),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(width = 240.dp, height = 160.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Ilustración",
-                        style = MaterialTheme.typography.titleMedium
+                Image(
+                    painter = painterResource(id = R.drawable.logo_bamx),
+                    contentDescription = stringResource(id = R.string.cd_logo_bamx),
+                    modifier = Modifier.size(40.dp),
+                    contentScale = ContentScale.Fit
+                )
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    androidx.compose.material3.Text(
+                        text = stringResource(id = R.string.brand_bamx),
+                        style = MaterialTheme.typography.titleLarge.merge(
+                            TextStyle(
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                lineHeight = 20.sp
+                            )
+                        )
+                    )
+                    androidx.compose.material3.Text(
+                        text = stringResource(id = R.string.brand_puebla),
+                        style = MaterialTheme.typography.labelLarge.merge(
+                            TextStyle(
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                lineHeight = 14.sp
+                            )
+                        )
                     )
                 }
             }
-        }
-    }
-}
 
-@Composable
-private fun ActionsHome() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        PrimaryButton(
-            text = stringResource(id = R.string.home_btn_start),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(Dimens.space12))
-        SecondaryButton(
-            text = stringResource(id = R.string.home_btn_parents),
-            modifier = Modifier.fillMaxWidth()
-        )
+            // 2) Banner “Aventuras con Nutri” (centrado arriba)
+            Image(
+                painter = painterResource(id = R.drawable.title_aventuras),
+                contentDescription = stringResource(id = R.string.cd_title_aventuras),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 72.dp)
+                    .fillMaxWidth(0.86f),
+                contentScale = ContentScale.Fit
+            )
+
+            // 3) Nutri a la derecha (MISMA posición, solo más grande)
+            Image(
+                painter = painterResource(id = R.drawable.home_illustration),
+                contentDescription = stringResource(id = R.string.cd_mascot_nutri),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 1.dp, bottom = 0.dp)
+                    .width(mascotWidth),     // sin límites extra
+                contentScale = ContentScale.Fit
+            )
+
+            // 4) Botones apilados (izquierda, parte baja)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 24.dp, bottom = 48.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                PlayButton()
+                Spacer(Modifier.height(16.dp))
+                ParentsButton()
+                Spacer(Modifier.height(16.dp))
+                SettingsButton()
+            }
+        }
     }
 }
 
@@ -153,9 +129,7 @@ private fun ActionsHome() {
 )
 @Composable
 private fun PreviewHomeLight() {
-    AppTheme(darkTheme = false) {
-        HomeScreen()
-    }
+    AppTheme(darkTheme = false) { HomeScreen() }
 }
 
 @Preview(
@@ -166,7 +140,5 @@ private fun PreviewHomeLight() {
 )
 @Composable
 private fun PreviewHomeDarkSmall() {
-    AppTheme(darkTheme = true) {
-        HomeScreen()
-    }
+    AppTheme(darkTheme = true) { HomeScreen() }
 }
