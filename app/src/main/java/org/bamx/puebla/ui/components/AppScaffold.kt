@@ -8,19 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.PaddingValues
 import org.bamx.puebla.ui.theme.Dimens
 
-/**
- * Contenedor base:
- * - Fondo opcional con scrim
- * - topBar opcional (otra composable)
- * - Área de contenido con padding consistente
- */
 @Composable
 fun AppScaffold(
     @DrawableRes backgroundResId: Int? = null,
     darkenBackground: Float = 0f,
     topBar: (@Composable () -> Unit)? = null,
+    padTopBar: Boolean = false,
+    contentPadding: PaddingValues = PaddingValues(Dimens.screenPadding),
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -31,16 +29,23 @@ fun AppScaffold(
                 contentDescription = null
             )
         }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimens.screenPadding)
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             if (topBar != null) {
-                topBar()
+                if (padTopBar) {
+                    Box(
+                        modifier = Modifier
+                            .padding(Dimens.screenPadding)
+                    ) { topBar() }
+                } else {
+                    topBar()
+                }
             }
-            // El contenido vive en un Box para permitir overlays internos si se requiere.
-            Box(modifier = Modifier.fillMaxSize(), content = content)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                content = content
+            )
         }
     }
 }

@@ -120,3 +120,21 @@ val DarkColors = darkColorScheme(
     outline = md_outline_dark,
     outlineVariant = md_outlineVariant_dark,
 )
+// --- Brand button colors (fuera del colorScheme) ---
+val brand_orange_button = Color(0xFFF57C00) // Naranja BAMX (approx)
+val brand_green_button  = Color(0xFF43A047) // Verde
+val brand_purple_button = Color(0xFF7E57C2) // Morado
+// Colores de tarjetas (aproximación al mockup)
+val card_yellow = Color(0xFFF7B338)
+val card_orange = Color(0xFFF59B45)
+val card_teal   = Color(0xFF6EC5B8)
+val card_pink   = Color(0xFFF08A97)
+// Header dividido (izq/dcha) y fondo base
+val header_left_beige = Color(0xFFE1C79A)   // ajusta si tienes el HEX exacto
+val header_right_black = Color(0xFF000000)
+// Header y fondo de Padres
+val header_cream      = Color(0xFFE1C79A) // mismo color a ambos lados del header
+val parents_bg_top    = Color(0xFFF4E3C3)
+val parents_bg_bottom = Color(0xFFFAF2E1)
+
+
