@@ -6,7 +6,6 @@
     <!-- Pantallas -->
     <string name="home_title">Pantalla inicial</string>
     <string name="parents_title">Pantalla de padres</string>
-    <string name="game_title">Pantalla del juego</string>
 
     <string name="btn_primary">Continuar</string>
     <string name="btn_secondary">Más info</string>
@@ -30,7 +29,80 @@
     <string name="cd_mascot_nutri">Nutri saludando</string>
     <string name="brand_bamx">BAMX</string>
     <string name="brand_puebla">Puebla</string>
+    <string name="parents_header">Padres</string>
 
+    <!-- Secciones -->
+    <string name="parents_section_info">Información</string>
+    <string name="parents_section_settings">Ajustes</string>
+    <string name="parents_section_help">Ayuda</string>
+
+    <!-- Info -->
+    <string name="parents_info_app">App: Aventuras con Nutri</string>
+    <string name="parents_info_version">Versión 1.0 (UI demo)</string>
+    <string name="parents_info_desc">Recursos y actividades para alimentación saludable.</string>
+
+    <!-- Ajustes (solo visual) -->
+    <string name="parents_opt_notifications">Notificaciones</string>
+    <string name="parents_opt_language">Idioma</string>
+    <string name="parents_opt_language_value">Español (MX)</string>
+    <string name="parents_opt_sound">Sonido</string>
+
+    <!-- Ayuda -->
+    <string name="parents_help_guide">Guía para padres</string>
+    <string name="parents_help_faq">Preguntas frecuentes</string>
+    <string name="parents_help_contact">Contacto</string>
+    <string name="parents_help_email">soporte@bamx.org.mx</string>
+
+    <!-- A11y -->
+    <string name="cd_parents_icon_info">Icono de información</string>
+    <string name="cd_parents_icon_settings">Icono de ajustes</string>
+    <string name="cd_parents_icon_help">Icono de ayuda</string>
+    <!-- PADRES (mockup nuevo) -->
+    <string name="parents_title_big">PADRES</string>
+    <string name="parents_card_progress">PROGRESO</string>
+    <string name="parents_card_weight">PESO/TALLA</string>
+    <string name="parents_card_tips">CONSEJOS Y RECETAS</string>
+    <string name="parents_card_time">TIEMPO DE JUEGO</string>
+
+    <!-- A11y -->
+    <string name="cd_back">Atrás (sin funcionalidad)</string>
+    <string name="cd_icon_progress">Icono de progreso</string>
+    <string name="cd_icon_weight">Icono de peso/talla</string>
+    <string name="cd_icon_tips">Icono de consejos y recetas</string>
+    <string name="cd_icon_time">Icono de tiempo de juego</string>
+    <!-- Juego -->
+    <string name="game_title">Juego</string>
+    <string name="game_instructions_title">Instrucciones</string>
+    <string name="game_instructions_body">Arrastra los alimentos a su categoría correcta. Completa el tablero antes de que el tiempo termine.</string>
+    <string name="game_score">Puntos</string>
+    <string name="game_lives">Vidas</string>
+    <string name="game_time">Tiempo</string>
+    <string name="game_btn_start">Iniciar</string>
+    <string name="game_btn_reset">Reiniciar</string>
+
+    <!-- A11y -->
+    <string name="cd_game_board">Área del juego</string>
+
+    <!-- Clasifica el alimento (mock) -->
+    <string name="classify_title">CLASIFICA EL ALIMENTO</string>
+    <string name="classify_daily">DIARIO</string>
+    <string name="classify_sometimes">A VECES</string>
+    <string name="classify_rare">OCASIONAL</string>
+    <string name="classify_feedback_title">¡MUY BIEN!</string>
+    <string name="classify_feedback_desc">La fruta es diaria</string>
+
+    <!-- A11y -->
+    <string name="cd_pause">Pausar (sin funcionalidad)</string>
+    <string name="cd_sign">Cartel del título</string>
+    <string name="cd_food">Alimento a clasificar</string>
+    <string name="cd_basket_daily">Canasta Diario</string>
+    <string name="cd_basket_sometimes">Canasta A veces</string>
+    <string name="cd_basket_rare">Canasta Ocasional</string>
+    <!-- Título en dos líneas para el juego -->
+    <string name="classify_title_multiline">CLASIFICA\nEL ALIMENTO</string>
+    <!-- Juego: panel de feedback -->
+    <string name="classify_feedback_title_text">¡MUY BIEN!</string>
+    <string name="classify_feedback_desc_text">La fruta es diaria</string>
 
 
 </resources>
