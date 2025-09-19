@@ -1,0 +1,5 @@
+<!-- BAMXPuebla/app/src/main/res/values/strings.xml -->
+<resources>
+    <string name="app_name">BAMX Puebla</string>
+    <string name="hello_preview">¡Hola, Compose!</string>
+</resources>

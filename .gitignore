@@ -1,0 +1,19 @@
+# BAMXPuebla/.gitignore
+.gradle/
+.idea/
+local.properties
+**/build/
+.DS_Store
+capture/
+.externalNativeBuild/
+.cxx/
+*.iml
+# Android Studio
+.navigation/
+.cache/
+.kotlin/
+# Keystores
+*.jks
+*.keystore
+# Logs
+*.log
