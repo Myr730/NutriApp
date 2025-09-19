@@ -1,24 +1,32 @@
-// BAMXPuebla/app/src/main/java/org/bamx/puebla/ui/theme/Theme.kt
 package org.bamx.puebla.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-
-// Paletas por defecto (provisionales). Se reemplazarán en Bloque 5.
-private val LightColors = lightColorScheme()
-private val DarkColors = darkColorScheme()
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    useDynamicColor: Boolean = false, // desactivado por defecto; activo solo en API 31+
     content: @Composable () -> Unit
 ) {
+    val colorScheme = when {
+        useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColors
+        else -> LightColors
+    }
+
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        // Tipografías/Formas provisionales; se definirán en Bloque 5.
+        colorScheme = colorScheme,
+        typography = AppTypography,
+        shapes = AppShapes,
         content = content
     )
 }
