@@ -7,4 +7,9 @@
     <string name="home_title">Pantalla inicial</string>
     <string name="parents_title">Pantalla de padres</string>
     <string name="game_title">Pantalla del juego</string>
+
+    <string name="btn_primary">Continuar</string>
+    <string name="btn_secondary">Más info</string>
+    <string name="sample_title">Título de sección</string>
+    <string name="sample_body">Este es un texto de ejemplo para previsualizar el contenido dentro de una tarjeta reutilizable.</string>
 </resources>
