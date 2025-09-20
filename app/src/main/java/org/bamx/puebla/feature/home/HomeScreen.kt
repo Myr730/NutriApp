@@ -2,16 +2,31 @@ package org.bamx.puebla.feature.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,30 +37,33 @@ import org.bamx.puebla.ui.components.AppScaffold
 import org.bamx.puebla.ui.components.ParentsButton
 import org.bamx.puebla.ui.components.PlayButton
 import org.bamx.puebla.ui.components.SettingsButton
+import org.bamx.puebla.ui.responsive.SizeClass
+import org.bamx.puebla.ui.responsive.rememberUiMetrics
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
 
 @Composable
 fun HomeScreen() {
+    val m = rememberUiMetrics()
+
+    // Mascota responsiva usando UiMetrics
+    val mascotWidth = if (m.sizeClass == SizeClass.Small)
+        (m.screenWidthDp * m.homeMascotFracSmall).dp
+    else
+        (m.screenWidthDp * m.homeMascotFracNormal*3).dp
+
     AppScaffold(
         backgroundResId = R.drawable.bg_home,
         darkenBackground = 0f
     ) {
-        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-        // Nutri más grande (sin límites): subimos las fracciones
-        val fracSmall = 0.75f   // teléfonos pequeños (≤360dp)
-        val fracNormal = 0.85f  // teléfonos “normales” (>360dp)
-        val mascotWidth = if (screenWidth <= 360.dp)
-            (screenWidth.value * fracSmall).dp
-        else
-            (screenWidth.value * fracNormal).dp
-
         Box(Modifier.fillMaxSize()) {
 
             // 1) Logo + “BAMX Puebla” (arriba-izquierda)
             Row(
                 modifier = Modifier
                     .align(Alignment.TopStart)
+                    // Evita solaparse con la barra de estado/notch
+                    .windowInsetsPadding(WindowInsets.statusBars)
                     .padding(top = Dimens.space16, start = Dimens.space16),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -87,19 +105,21 @@ fun HomeScreen() {
                 contentDescription = stringResource(id = R.string.cd_title_aventuras),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
+                    // Aire respecto a status bar
+                    .windowInsetsPadding(WindowInsets.statusBars)
                     .padding(top = 72.dp)
-                    .fillMaxWidth(0.86f),
+                    .fillMaxWidth(m.homeBannerWidthFraction),
                 contentScale = ContentScale.Fit
             )
 
-            // 3) Nutri a la derecha (MISMA posición, solo más grande)
+            // 3) Nutri a la derecha (misma posición, tamaño responsivo)
             Image(
                 painter = painterResource(id = R.drawable.home_illustration),
                 contentDescription = stringResource(id = R.string.cd_mascot_nutri),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 1.dp, bottom = 0.dp)
-                    .width(mascotWidth),     // sin límites extra
+                    .width(mascotWidth),
                 contentScale = ContentScale.Fit
             )
 
@@ -107,14 +127,22 @@ fun HomeScreen() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
+                    // Evita chocar con la barra de gestos
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(start = 24.dp, bottom = 48.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                PlayButton()
+                PlayButton(
+                    modifier = Modifier.semantics { role = Role.Button }
+                )
                 Spacer(Modifier.height(16.dp))
-                ParentsButton()
+                ParentsButton(
+                    modifier = Modifier.semantics { role = Role.Button }
+                )
                 Spacer(Modifier.height(16.dp))
-                SettingsButton()
+                SettingsButton(
+                    modifier = Modifier.semantics { role = Role.Button }
+                )
             }
         }
     }
