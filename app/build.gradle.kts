@@ -1,26 +1,26 @@
-// BAMXPuebla/app/build.gradle.kts
+// app/build.gradle.kts
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // Habilita el plugin de Compose para gestionar automáticamente la versión del compilador
-    id("org.jetbrains.kotlin.plugin.compose")
+
+    // Calidad
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 android {
     namespace = "org.bamx.puebla"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "org.bamx.puebla"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -32,16 +32,9 @@ android {
             )
         }
         debug {
-            // sin cambios para ahora
+            // Ajustes de depuración si los necesitas
         }
     }
-
-    buildFeatures {
-        compose = true
-    }
-
-    // Usando el plugin compose, ya no es obligatorio fijar kotlinCompilerExtensionVersion manualmente.
-    // composeOptions {} no es necesario aquí.
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -51,38 +44,73 @@ android {
         jvmTarget = "17"
     }
 
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        // Versión estable y muy compatible del compiler de Compose
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    // Opcional: firma, splits, etc. van aquí si los usas
 }
 
-// BAMXPuebla/app/build.gradle.kts
-dependencies {
-    // --- Core Android/Kotlin ---
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-compose:1.9.2")
+/* ===========================
+   Calidad: ktlint + detekt
+   =========================== */
 
-    // --- Jetpack Compose (alineado con BOM) ---
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.01")
+ktlint {
+    android.set(true)
+    // Pon en true si NO quieres que falle el build por estilo al inicio
+    ignoreFailures.set(true)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+    filter {
+        exclude("**/generated/**", "**/build/**")
+        include("**/java/**", "**/kotlin/**")
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    parallel = true
+    ignoreFailures = true
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/baseline.xml") // se generará
+}
+
+dependencies {
+    // ===== Compose BOM (gestiona versiones entre artefactos Compose) =====
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
-    // Módulos gestionados por el BOM (sin versión explícita)
+    // Compose principal
+    implementation("androidx.activity:activity-compose:1.9.2")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Tooling solo en debug
+    // Debug / Preview tooling
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Tests
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-}
 
+    // Detekt formatting (envuelve reglas de ktlint para detekt)
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
+}
