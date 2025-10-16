@@ -29,6 +29,7 @@ import org.bamx.puebla.ui.responsive.SizeClass
 import org.bamx.puebla.ui.responsive.rememberUiMetrics
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
+import org.bamx.puebla.ui.theme.card_green
 import org.bamx.puebla.ui.theme.card_orange
 import org.bamx.puebla.ui.theme.card_pink
 import org.bamx.puebla.ui.theme.card_teal
@@ -104,6 +105,14 @@ fun ParentsScreen() {
                     modifier = Modifier
                         .semantics { role = Role.Button }
                 )
+                FeatureCardLarge(
+                    title = stringResource(id = R.string.parents_card_info),
+                    background = card_green,
+                    leadingResId = R.drawable.ic_info,
+                    leadingContentDescription = stringResource(id = R.string.cd_parents_icon_info),
+                    modifier = Modifier
+                        .semantics { role = Role.Button }
+                )
             }
         }
     }
@@ -124,7 +133,6 @@ private fun PreviewParentsLight() {
 @Preview(
     name = "Parents - 360x640 Dark",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
     device = "spec:width=360dp,height=640dp,dpi=320"
 )
 @Composable

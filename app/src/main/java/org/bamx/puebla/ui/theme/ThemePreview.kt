@@ -1,10 +1,10 @@
 package org.bamx.puebla.ui.theme
 
-import android.content.res.Configuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import android.content.res.Configuration
 
 @Preview(name = "Theme Light", showBackground = true)
 @Composable

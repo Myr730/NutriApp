@@ -50,7 +50,7 @@ fun HomeScreen() {
     val mascotWidth = if (m.sizeClass == SizeClass.Small)
         (m.screenWidthDp * m.homeMascotFracSmall).dp
     else
-        (m.screenWidthDp * m.homeMascotFracNormal*3).dp
+        (m.screenWidthDp * m.homeMascotFracNormal*3     ).dp
 
     AppScaffold(
         backgroundResId = R.drawable.bg_home,
@@ -114,7 +114,7 @@ fun HomeScreen() {
 
             // 3) Nutri a la derecha (misma posición, tamaño responsivo)
             Image(
-                painter = painterResource(id = R.drawable.home_illustration),
+                painter = painterResource(id = R.drawable.nutri_home),
                 contentDescription = stringResource(id = R.string.cd_mascot_nutri),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -140,9 +140,7 @@ fun HomeScreen() {
                     modifier = Modifier.semantics { role = Role.Button }
                 )
                 Spacer(Modifier.height(16.dp))
-                SettingsButton(
-                    modifier = Modifier.semantics { role = Role.Button }
-                )
+
             }
         }
     }

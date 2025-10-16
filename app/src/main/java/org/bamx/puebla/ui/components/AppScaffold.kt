@@ -4,12 +4,11 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.PaddingValues
 import org.bamx.puebla.ui.theme.Dimens
 
 @Composable
@@ -19,7 +18,7 @@ fun AppScaffold(
     topBar: (@Composable () -> Unit)? = null,
     padTopBar: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(Dimens.screenPadding),
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (backgroundResId != null) {

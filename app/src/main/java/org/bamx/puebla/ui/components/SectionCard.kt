@@ -25,7 +25,7 @@ import org.bamx.puebla.ui.theme.Dimens
 fun SectionCard(
     title: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),

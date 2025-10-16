@@ -18,7 +18,7 @@ import org.bamx.puebla.ui.theme.Dimens
 @Composable
 fun Headline(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text = text,

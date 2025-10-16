@@ -1,32 +1,45 @@
 package org.bamx.puebla.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+
+private val LightColors = lightColorScheme(
+    primary = Primary,
+    onPrimary = OnPrimary,
+    secondary = Secondary,
+    onSecondary = OnSecondary,
+    tertiary = Tertiary,
+    onTertiary = OnTertiary,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight,
+    background = SurfaceLight,
+    onBackground = OnSurfaceLight
+)
+
+private val DarkColors = darkColorScheme(
+    primary = Primary,
+    onPrimary = OnPrimary,
+    secondary = Secondary,
+    onSecondary = OnSecondary,
+    tertiary = Tertiary,
+    onTertiary = OnTertiary,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark,
+    background = SurfaceDark,
+    onBackground = OnSurfaceDark
+)
 
 @Composable
 fun AppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    useDynamicColor: Boolean = false, // desactivado por defecto; activo solo en API 31+
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColors
-        else -> LightColors
-    }
-
+    val colors = if (darkTheme) DarkColors else LightColors
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colors,
         typography = AppTypography,
-        shapes = AppShapes,
         content = content
     )
 }

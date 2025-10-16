@@ -15,7 +15,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
+import org.bamx.puebla.ui.responsive.rememberUiMetrics
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
 
@@ -38,24 +38,21 @@ fun ClassifyMockScreen(
     showSuccessPanel: Boolean = true,
     @DrawableRes currentFoodRes: Int = R.drawable.food_apple,
 ) {
-    val screenW = LocalConfiguration.current.screenWidthDp
-    val isSmall = screenW <= 360
+    val m = rememberUiMetrics() // <- centraliza tamaños por clase de pantalla
 
-    // Proporciones visuales (muy cercanas al mock)
-    val signWidthFraction = if (isSmall) 0.88f else 0.82f
-    val titleFontSize = if (isSmall) 28.sp else 32.sp
-    val titleLineHeight = if (isSmall) 32.sp else 36.sp
+    val signWidthFraction = m.gameSignWidthFraction
+    val titleFontSize = m.gameTitleFontSizeSp.sp
+    val titleLineHeight = m.gameTitleLineHeightSp.sp
+    val fruitWidth = (m.screenWidthDp * m.gameFruitWidthFraction).dp
+    val successWidthFraction = m.gameSuccessWidthFraction
 
-    val fruitWidth = if (isSmall) (screenW * 0.60f).dp else (screenW * 0.58f).dp
-    val successWidthFraction = if (isSmall) 0.84f else 0.78f
-
-    // Canastas: más grandes (ajustable)
-    val basketHeight: Dp = (screenW * 0.38f).dp
-    val bottomPadding = if (isSmall) 8.dp else 10.dp
+    // Canastas grandes (puedes afinar m.gameBasketHeightFraction en UiMetrics.kt)
+    val basketHeight: Dp = (m.screenWidthDp * m.gameBasketHeightFraction).dp
+    val bottomPadding = if (m.sizeClass == org.bamx.puebla.ui.responsive.SizeClass.Small) 8.dp else 10.dp
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Fondo del mercado (asegúrate de tener drawable-nodpi/bg_market.webp)
+        // Fondo
         Image(
             painter = painterResource(id = R.drawable.bg_market),
             contentDescription = null,
@@ -63,19 +60,19 @@ fun ClassifyMockScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Botón de pausa arriba-izquierda (fuera del cartel)
+        // Pausa arriba-izquierda
         Image(
-            painter = painterResource(id = R.drawable.btn_pause),
+            painter = painterResource(id = R.drawable.ic_pause),
             contentDescription = stringResource(id = R.string.cd_pause),
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(start = 24.dp, top = 24.dp)
-                .size(if (isSmall) 44.dp else 52.dp)
+                .size(if (m.sizeClass == org.bamx.puebla.ui.responsive.SizeClass.Small) 44.dp else 52.dp)
                 .semantics { role = Role.Button },
             contentScale = ContentScale.Fit
         )
 
-        // Cartel centrado + título (2 líneas) alineado al cartel
+        // Cartel centrado + título (2 líneas)
         Box(
             modifier = Modifier
                 .fillMaxWidth(signWidthFraction)
@@ -92,7 +89,7 @@ fun ClassifyMockScreen(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .padding(horizontal = 24.dp), // padding interior del cartel
+                    .padding(horizontal = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -115,7 +112,7 @@ fun ClassifyMockScreen(
             }
         }
 
-        // Fruta grande al centro
+        // Fruta al centro
         Image(
             painter = painterResource(id = currentFoodRes),
             contentDescription = stringResource(id = R.string.cd_food),
@@ -125,12 +122,12 @@ fun ClassifyMockScreen(
                 .width(fruitWidth)
         )
 
-        // Panel verde de feedback (centrado)
+        // Panel verde (centrado)
         if (showSuccessPanel) {
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .offset(y = fruitWidth * 0.85f) // bajo la fruta
+                    .offset(y = fruitWidth * 0.85f)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.feedback_panel_success),
@@ -162,8 +159,8 @@ fun ClassifyMockScreen(
                         Spacer(Modifier.width(8.dp))
                         Image(
                             painter = painterResource(id = R.drawable.ic_check),
-                            contentDescription = null, // decorativo
-                            modifier = Modifier.size(24.dp)
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                     Spacer(Modifier.height(4.dp))
@@ -176,7 +173,7 @@ fun ClassifyMockScreen(
             }
         }
 
-        // Canastas: más grandes y más arriba
+        // Canastas
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -186,7 +183,7 @@ fun ClassifyMockScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.92f) // carril más estrecho para acercarlas entre sí
+                    .fillMaxWidth(0.92f)
                     .align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom

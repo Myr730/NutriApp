@@ -1,140 +1,84 @@
 package org.bamx.puebla.ui.theme
 
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// --- LIGHT ---
-val md_primary_light = Color(0xFFD32F2F) // Red 700
-val md_onPrimary_light = Color(0xFFFFFFFF)
-val md_primaryContainer_light = Color(0xFFFFCDD2) // red100
-val md_onPrimaryContainer_light = Color(0xFF410002)
+// ============================
+// Esquema base (Material 3)
+// ============================
+val Primary       = Color(0xFFB71C1C)
+val OnPrimary     = Color(0xFFFFFFFF)
+val Secondary     = Color(0xFF00695C)
+val OnSecondary   = Color(0xFFFFFFFF)
+val Tertiary      = Color(0xFF33691E)
+val OnTertiary    = Color(0xFFFFFFFF)
 
-val md_secondary_light = Color(0xFFF57C00) // Orange 700
-val md_onSecondary_light = Color(0xFFFFFFFF)
-val md_secondaryContainer_light = Color(0xFFFFE0B2) // orange100
-val md_onSecondaryContainer_light = Color(0xFF301400)
+// Superficies
+val SurfaceLight   = Color(0xFFFDF7EF) // crema claro general
+val OnSurfaceLight = Color(0xFF1E1E1E)
+val SurfaceDark    = Color(0xFF101010)
+val OnSurfaceDark  = Color(0xFFECECEC)
 
-val md_tertiary_light = Color(0xFF2E7D32) // Green 700
-val md_onTertiary_light = Color(0xFFFFFFFF)
-val md_tertiaryContainer_light = Color(0xFFC8E6C9) // green100
-val md_onTertiaryContainer_light = Color(0xFF00210B)
+// ============================
+// TOKENS usados por pantallas
+// ============================
 
-val md_error_light = Color(0xFFB3261E)
-val md_onError_light = Color(0xFFFFFFFF)
-val md_errorContainer_light = Color(0xFFF9DEDC)
-val md_onErrorContainer_light = Color(0xFF410E0B)
+// Header crema SplitHeader (Padres)
+val header_cream = Color(0xFFF6EBDC)
 
-val md_background_light = Color(0xFFFFFBFE)
-val md_onBackground_light = Color(0xFF1B1B1F)
-val md_surface_light = Color(0xFFFFFBFE)
-val md_onSurface_light = Color(0xFF1B1B1F)
-val md_surfaceVariant_light = Color(0xFFE7E0EC)
-val md_onSurfaceVariant_light = Color(0xFF49454F)
-val md_outline_light = Color(0xFF79747E)
-val md_outlineVariant_light = Color(0xFFCAC4D0)
-val md_surfaceDim_light = Color(0xFFECE6F0)
+// Degradado Padres
+val parents_bg_top    = Color(0xFFFFF7ED)
+val parents_bg_bottom = Color(0xFFF9EFE6)
 
-// --- DARK ---
-val md_primary_dark = Color(0xFFFF8983) // tono claro de rojo para dark
-val md_onPrimary_dark = Color(0xFF5F1312)
-val md_primaryContainer_dark = Color(0xFF8C1C1A)
-val md_onPrimaryContainer_dark = Color(0xFFFFDAD6)
+// Tarjetas (Padres)
+val card_yellow = Color(0xFFFFE082)
+val card_orange = Color(0xFFFFB74D)
 
-val md_secondary_dark = Color(0xFFFFB86C)
-val md_onSecondary_dark = Color(0xFF4C2800)
-val md_secondaryContainer_dark = Color(0xFF7A4400)
-val md_onSecondaryContainer_dark = Color(0xFFFFDCBE)
+val card_green = Color(0xFFF0DBAA)
+val card_teal   = Color(0xFF4DB6AC)
+val card_pink   = Color(0xFFF48FB1)
 
-val md_tertiary_dark = Color(0xFF8DD39A)
-val md_onTertiary_dark = Color(0xFF0A3817)
-val md_tertiaryContainer_dark = Color(0xFF145122)
-val md_onTertiaryContainer_dark = Color(0xFFBDF1C4)
+// Juego: tablero/board (para GameScreen)
+val board_bg_cream   = Color(0xFFFFF3E0) // crema suave del área de juego
+val board_border_tan = Color(0xFFD8C2A4) // borde "tan" (ajústalo si tu asset pide otro tono)
 
-val md_error_dark = Color(0xFFF2B8B5)
-val md_onError_dark = Color(0xFF601410)
-val md_errorContainer_dark = Color(0xFF8C1D18)
-val md_onErrorContainer_dark = Color(0xFFF9DEDC)
+// Overlays / scrims
+val ScrimDark20 = Color(0x33000000)   // 20% negro
+val ScrimDark40 = Color(0x66000000)   // 40% negro
+// ============================
+// Tokens extra usados en GameScreen y HomeButtons
+// ============================
 
-val md_background_dark = Color(0xFF1B1B1F)
-val md_onBackground_dark = Color(0xFFE3E2E6)
-val md_surface_dark = Color(0xFF1B1B1F)
-val md_onSurface_dark = Color(0xFFE3E2E6)
-val md_surfaceVariant_dark = Color(0xFF49454F)
-val md_onSurfaceVariant_dark = Color(0xFFCAC4D0)
-val md_outline_dark = Color(0xFF948F99)
-val md_outlineVariant_dark = Color(0xFF49454F)
-val md_surfaceDim_dark = Color(0xFF121316)
 
-// Esquemas Material3 listos:
-val LightColors = lightColorScheme(
-    primary = md_primary_light,
-    onPrimary = md_onPrimary_light,
-    primaryContainer = md_primaryContainer_light,
-    onPrimaryContainer = md_onPrimaryContainer_light,
-    secondary = md_secondary_light,
-    onSecondary = md_onSecondary_light,
-    secondaryContainer = md_secondaryContainer_light,
-    onSecondaryContainer = md_onSecondaryContainer_light,
-    tertiary = md_tertiary_light,
-    onTertiary = md_onTertiary_light,
-    tertiaryContainer = md_tertiaryContainer_light,
-    onTertiaryContainer = md_onTertiaryContainer_light,
-    error = md_error_light,
-    onError = md_onError_light,
-    errorContainer = md_errorContainer_light,
-    onErrorContainer = md_onErrorContainer_light,
-    background = md_background_light,
-    onBackground = md_onBackground_light,
-    surface = md_surface_light,
-    onSurface = md_onSurface_light,
-    surfaceVariant = md_surfaceVariant_light,
-    onSurfaceVariant = md_onSurfaceVariant_light,
-    outline = md_outline_light,
-    outlineVariant = md_outlineVariant_light,
-)
+// Botones (HomeButtons)
+val brand_green_button  = Color(0xFF2E7D32)     // verde “acción”
+val brand_orange_button = Color(0xFFEF6C00)     // naranja destacado
+val brand_purple_button = Color(0xFF8E24AA)     // púrpura acento
 
-val DarkColors = darkColorScheme(
-    primary = md_primary_dark,
-    onPrimary = md_onPrimary_dark,
-    primaryContainer = md_primaryContainer_dark,
-    onPrimaryContainer = md_onPrimaryContainer_dark,
-    secondary = md_secondary_dark,
-    onSecondary = md_onSecondary_dark,
-    secondaryContainer = md_secondaryContainer_dark,
-    onSecondaryContainer = md_onSecondaryContainer_dark,
-    tertiary = md_tertiary_dark,
-    onTertiary = md_onTertiary_dark,
-    tertiaryContainer = md_tertiaryContainer_dark,
-    onTertiaryContainer = md_onTertiaryContainer_dark,
-    error = md_error_dark,
-    onError = md_onError_dark,
-    errorContainer = md_errorContainer_dark,
-    onErrorContainer = md_onErrorContainer_dark,
-    background = md_background_dark,
-    onBackground = md_onBackground_dark,
-    surface = md_surface_dark,
-    onSurface = md_onSurface_dark,
-    surfaceVariant = md_surfaceVariant_dark,
-    onSurfaceVariant = md_onSurfaceVariant_dark,
-    outline = md_outline_dark,
-    outlineVariant = md_outlineVariant_dark,
-)
-// --- Brand button colors (fuera del colorScheme) ---
-val brand_orange_button = Color(0xFFF57C00) // Naranja BAMX (approx)
-val brand_green_button  = Color(0xFF43A047) // Verde
-val brand_purple_button = Color(0xFF7E57C2) // Morado
-// Colores de tarjetas (aproximación al mockup)
-val card_yellow = Color(0xFFF7B338)
-val card_orange = Color(0xFFF59B45)
-val card_teal   = Color(0xFF6EC5B8)
-val card_pink   = Color(0xFFF08A97)
-// Header dividido (izq/dcha) y fondo base
-val header_left_beige = Color(0xFFE1C79A)   // ajusta si tienes el HEX exacto
-val header_right_black = Color(0xFF000000)
-// Header y fondo de Padres
-val header_cream      = Color(0xFFE1C79A) // mismo color a ambos lados del header
-val parents_bg_top    = Color(0xFFF4E3C3)
-val parents_bg_bottom = Color(0xFFFAF2E1)
+// (Opcional) Colores de texto sobre esos botones si los necesitas en tus componentes
+val on_brand_green_button  = Color(0xFFFFFFFF)
+val on_brand_orange_button = Color(0xFFFFFFFF)
+val on_brand_purple_button = Color(0xFFFFFFFF)
+// ==== Timeout screen tokens ====
+val timeout_header_green = Color(0xFF2E9C5F)      // verde encabezado
+val timeout_panel_beige  = Color(0xFFF7EEDC)      // panel de texto
+val timeout_panel_shadow = Color(0x33000000)      // sombra sutil (20% negro)
+// ==== Memorama tokens (opcionales) ====
+val memorama_title_shadow = Color(0x33000000)   // 20% negro para sombra sutil
+val memorama_card_border = Color(0x33000000)    // borde tenue
+val memorama_scrim = Color(0x00000000)          // por si quisieras scrim (0% por ahora)
+val bannerRed = Color(0xFFEA5D5D)
+// Cartel rojo para banners/títulos en juegos
+val timeout_header_red = Color(0xFFE85D5D) // puedes ajustar el tono si lo deseas
+// Banner rojo (cartel superior)
+val brandRedBanner = Color(0xFFFF6B6B)
 
+// Botón verde “¡LISTO!”
+val brandGreenButton = Color(0xFF38B24D)
+
+// Placeholders (slots)
+val slotBlue   = Color(0xFF5EC8FF)
+val slotOrange = Color(0xFFFFA74D)
+
+// (Opcional) contorno suave para los slots
+val slotStroke = Color(0x1A000000) // negro con 10% aprox.
 

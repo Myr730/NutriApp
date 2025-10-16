@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 fun BackgroundImage(
     @DrawableRes resId: Int,
     darken: Float = 0f,
-    contentDescription: String? = null // null si es puramente decorativa
+    contentDescription: String? = null, // null si es puramente decorativa
 ) {
     // Se usa fillMaxSize() para que el Box ocupe todo el espacio padre
     Box(modifier = Modifier.fillMaxSize()) {

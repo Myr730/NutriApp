@@ -26,7 +26,7 @@ fun PrimaryButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    leadingIcon: ImageVector? = null
+    leadingIcon: ImageVector? = null,
 ) {
     Button(
         onClick = {}, // placeholder sin lógica

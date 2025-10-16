@@ -21,7 +21,7 @@ fun SecondaryButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    leadingIcon: ImageVector? = null
+    leadingIcon: ImageVector? = null,
 ) {
     OutlinedButton(
         onClick = {}, // sin lógica
@@ -31,7 +31,7 @@ fun SecondaryButton(
             contentColor = MaterialTheme.colorScheme.primary
         ),
         // Si tu versión de Material3 no tiene outlinedButtonBorder, ver "Fallback" abajo.
-        border = ButtonDefaults.outlinedButtonBorder(enabled = enabled)
+        border = ButtonDefaults.outlinedButtonBorder
     ) {
         Row {
             if (leadingIcon != null) {

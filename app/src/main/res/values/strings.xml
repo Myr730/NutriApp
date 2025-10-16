@@ -63,6 +63,8 @@
     <string name="parents_card_weight">PESO/TALLA</string>
     <string name="parents_card_tips">CONSEJOS Y RECETAS</string>
     <string name="parents_card_time">TIEMPO DE JUEGO</string>
+    <string name="parents_card_info">ACERCA DE LA APP</string>
+
 
     <!-- A11y -->
     <string name="cd_back">Atrás (sin funcionalidad)</string>
@@ -104,5 +106,71 @@
     <string name="classify_feedback_title_text">¡MUY BIEN!</string>
     <string name="classify_feedback_desc_text">La fruta es diaria</string>
 
+    <string name="btn_play">JUGAR</string>
+    <string name="btn_parents">PADRES</string>
+    <string name="btn_settings">AJUSTES</string>
 
+    <!-- Padres -->
+    <string name="parents_progress">PROGRESO</string>
+    <string name="parents_weight_height">PESO/TALLA</string>
+    <string name="parents_tips_recipes">CONSEJOS Y RECETAS</string>
+    <string name="parents_playtime">TIEMPO DE JUEGO</string>
+    <string name="timeout_title">¡HORA DE MOVERSE!</string>
+    <string name="timeout_body">Llevas 15 min jugando, hagamos 5 minutos de estiramiento.</string>
+    <string name="cd_timeout_bg">Fondo de una sala con muebles</string>
+    <string name="cd_timeout_mascot">Nutri estirándose</string>
+    <string name="cd_timeout_timer">Temporizador circular</string>
+    <string name="memorama_title">¡Encuentra las parejas iguales!</string>
+    <string name="memorama_back">Regresar</string>
+    <string name="cd_memorama_bg">Fondo de picnic con mantel</string>
+    <string name="cd_card_back">Reverso de carta</string>
+    <string name="cd_card_placeholder">Ícono de carta (placeholder)</string>
+    <string name="level_select_title">¡ELIGE TU NIVEL!</string>
+    <string name="level_tip_swipe">DESLIZA PARA VER MÁS NIVELES</string>
+    <string name="cd_level_icon">Ícono del nivel</string>
+    <string name="cd_arrow_left">Nivel anterior</string>
+    <string name="cd_arrow_right">Siguiente nivel</string>
+    <string name="cd_mascot">Nutri señalando</string>
+    <!-- Smoothie / Arma tu licuado -->
+    <string name="smoothie_title">¡PREPARA EL LICUADO!</string>
+    <string name="cd_bg_smoothie">Fondo de la cocina con Nutri</string>
+
+    <!-- Accesibilidad de ingredientes -->
+    <string name="cd_required_ingredient">Ingrediente requerido</string>
+    <string name="cd_fruit_option">Opción de fruta</string>
+
+    <!-- Frutas (para contentDescription específicos) -->
+
+    <string name="cd_food_banana">Plátano</string>
+    <string name="cd_food_strawberry">Fresa</string>
+    <string name="cd_food_grape">Uva</string>
+    <string name="cd_food_orange">Naranja</string>
+
+    <string name="arma_tu_plato_title">ARMA TU PLATO</string>
+    <string name="arma_tu_plato_ready">¡LISTO!</string>
+    <string name="cd_background">Fondo</string>
+
+    <string name="cd_food_on_plate">Alimento en el plato</string>
+    <string name="cd_food_broccoli">Brócoli</string>
+    <string name="cd_food_meat">Proteína</string>
+    <string name="cd_food_apple">Manzana</string>
+    <string name="cd_food_cheese">Queso</string>
+    <!-- Arma tu plato -->
+    <string name="arma_title">ARMA TU PLATO</string>
+    <string name="arma_ready">¡LISTO!</string>
+
+    <!-- A11y / contentDescription -->
+    <string name="cd_bg_arma">Fondo de cielo y pasto</string>
+    <string name="cd_nutri">Nutri saludando</string>
+    <string name="cd_plate">Plato vacío</string>
+    <string name="cd_slot">Lugar para alimento</string>
+    <!-- res/values/strings.xml -->
+
+        <!-- Título del cartel -->
+        <string name="guess_title">¡ADIVINA LA VERDURA!</string>
+
+        <!-- Descripciones de accesibilidad -->
+    <string name="cd_character">Nutri pensando</string>
+    <string name="loading_label">CARGANDO</string>
+    <string name="cd_logo_app">Logo Aventuras con Nutri</string>
 </resources>
