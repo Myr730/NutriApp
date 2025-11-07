@@ -3,6 +3,7 @@ package org.bamx.puebla.feature.guess
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,12 +29,13 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun GuessTheVegetableScreen(
+    onBackClick: () -> Unit = {}
     modifier: Modifier = Modifier,
     title: String = stringResource(id = R.string.guess_title), // “¡ADIVINA LA VERDURA!”
     wordPlaceholders: String = "_  _  _  _  _",
     @DrawableRes backgroundRes: Int = R.drawable.bg_guess,           // fondo exterior
-    @DrawableRes backRes: Int = R.drawable.ic_pause,                 // botón de regresar (imagen redonda)
-    @DrawableRes characterRes: Int = R.drawable.nutri_guess     // cámbialo por tu nutri pensativo si lo tienes
+    @DrawableRes characterRes: Int = R.drawable.nutri_guess
+
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Fondo
@@ -42,6 +44,17 @@ fun GuessTheVegetableScreen(
             contentDescription = stringResource(id = R.string.cd_background),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
+        )
+        // Botón de regresar
+        Image(
+            painter = painterResource(id = R.drawable.ic_back2),
+            contentDescription = stringResource(id = R.string.cd_back),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp, top = 12.dp)
+                .size(52.dp)
+                .clickable { onBackClick() },
+            contentScale = ContentScale.Fit
         )
 
         Column(

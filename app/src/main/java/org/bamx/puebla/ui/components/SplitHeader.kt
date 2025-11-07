@@ -32,7 +32,8 @@ fun SplitHeader(
     leadingResId: Int = R.drawable.ic_back, // usa tu asset real
     leadingContentDescription: String,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
+    onLeadingClick: () -> Unit
 ) {
     // En Previews ‘dark’ no siempre coincide con System, pero esto mantiene tu regla:
     // Claro -> blanco, Oscuro -> negro

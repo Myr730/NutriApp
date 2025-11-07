@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "org.bamx.puebla"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.bamx.puebla"
@@ -100,6 +100,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
     // Debug / Preview tooling
     debugImplementation("androidx.compose.ui:ui-tooling")

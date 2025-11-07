@@ -24,9 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,17 +33,18 @@ import org.bamx.puebla.R
 import org.bamx.puebla.ui.components.AppScaffold
 import org.bamx.puebla.ui.components.ParentsButton
 import org.bamx.puebla.ui.components.PlayButton
-import org.bamx.puebla.ui.components.SettingsButton
 import org.bamx.puebla.ui.responsive.SizeClass
 import org.bamx.puebla.ui.responsive.rememberUiMetrics
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onPlayClick: () -> Unit = {},
+    onParentsClick: () -> Unit = {}
+) {
     val m = rememberUiMetrics()
 
-    // Mascota responsiva usando UiMetrics
     val mascotWidth = if (m.sizeClass == SizeClass.Small)
         (m.screenWidthDp * m.homeMascotFracSmall).dp
     else
@@ -127,20 +125,20 @@ fun HomeScreen() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    // Evita chocar con la barra de gestos
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(start = 24.dp, bottom = 48.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 PlayButton(
-                    modifier = Modifier.semantics { role = Role.Button }
+                    modifier = Modifier,
+                    onClick = onPlayClick
                 )
                 Spacer(Modifier.height(16.dp))
                 ParentsButton(
-                    modifier = Modifier.semantics { role = Role.Button }
+                    modifier = Modifier,
+                    onClick = onParentsClick
                 )
                 Spacer(Modifier.height(16.dp))
-
             }
         }
     }

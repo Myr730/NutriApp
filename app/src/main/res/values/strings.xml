@@ -59,11 +59,27 @@
     <string name="cd_parents_icon_help">Icono de ayuda</string>
     <!-- PADRES (mockup nuevo) -->
     <string name="parents_title_big">PADRES</string>
-    <string name="parents_card_progress">PROGRESO</string>
+    <string name="parents_card_progress">PROGRESO(peso/talla)</string>
     <string name="parents_card_weight">PESO/TALLA</string>
     <string name="parents_card_tips">CONSEJOS Y RECETAS</string>
     <string name="parents_card_time">TIEMPO DE JUEGO</string>
     <string name="parents_card_info">ACERCA DE LA APP</string>
+
+    <!-- AdjustTimeScreen strings -->
+    <string name="time_screen_title">AJUSTAR TIEMPO</string>
+    <string name="time_game_title">Tiempo de juego</string>
+    <string name="time_game_subtitle">¿Cuánto quieres jugar antes del descanso?</string>
+    <string name="time_break_title">Pausa de estiramiento</string>
+    <string name="time_break_subtitle">Duración de la pausa para moverse</string>
+    <string name="time_save_button">GUARDAR</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_decrease_minutes">Disminuir minutos</string>
+    <string name="cd_increase_minutes">Aumentar minutos</string>
+    <string name="cd_decrease_seconds">Disminuir segundos</string>
+    <string name="cd_increase_seconds">Aumentar segundos</string>
+
+
 
 
     <!-- A11y -->
@@ -99,7 +115,7 @@
     <string name="cd_food">Alimento a clasificar</string>
     <string name="cd_basket_daily">Canasta Diario</string>
     <string name="cd_basket_sometimes">Canasta A veces</string>
-    <string name="cd_basket_rare">Canasta Ocasional</string>
+    <string name="cd_basket_rare">Canasta Occasional</string>
     <!-- Título en dos líneas para el juego -->
     <string name="classify_title_multiline">CLASIFICA\nEL ALIMENTO</string>
     <!-- Juego: panel de feedback -->
@@ -173,4 +189,23 @@
     <string name="cd_character">Nutri pensando</string>
     <string name="loading_label">CARGANDO</string>
     <string name="cd_logo_app">Logo Aventuras con Nutri</string>
+
+    <!-- Indicadores de nivel -->
+    <string name="level_indicator">Nivel %1$d de %2$d</string>
+
+    <!-- Títulos y descripciones de niveles -->
+    <string name="level1_title">Verduras</string>
+    <string name="level1_description">Aprende sobre verduras y sus beneficios</string>
+
+    <string name="level2_title">Frutas</string>
+    <string name="level2_description">Descubre el mundo de las frutas</string>
+
+    <string name="level3_title">Proteínas</string>
+    <string name="level3_description">Conoce las proteínas saludables</string>
+
+    <string name="level4_title">Granos</string>
+    <string name="level4_description">Explora los granos y cereales</string>
+
+    <string name="level5_title">Lácteos</string>
+    <string name="level5_description">Aprende sobre productos lácteos</string>
 </resources>

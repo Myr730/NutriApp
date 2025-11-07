@@ -1,18 +1,24 @@
-// BAMXPuebla/app/src/main/java/org/bamx/puebla/MainActivity.kt
 package org.bamx.puebla
 
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import android.content.res.Configuration
-import android.os.Bundle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import org.bamx.puebla.feature.armatuplato.ArmaTuPlatoScreen
+import org.bamx.puebla.feature.classifymock.ClassifyMockScreen
+import org.bamx.puebla.feature.consejos.ConsejosScreen
+import org.bamx.puebla.feature.guessthevegetable.GuessTheVegetableScreen
+import org.bamx.puebla.feature.home.HomeScreen
+import org.bamx.puebla.feature.levelselection.LevelSelectionScreen
+import org.bamx.puebla.feature.memorama.MemoramaScreen
+import org.bamx.puebla.feature.parents.ParentsScreen
+import org.bamx.puebla.feature.progress.ProgressScreen
+import org.bamx.puebla.feature.smoothiemaker.SmoothieMakerScreen
+import org.bamx.puebla.feature.timeout.AdjustTimeScreen
 import org.bamx.puebla.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,50 +26,160 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    HelloPreviewText()
-                }
+                AppNavGraph()
             }
         }
     }
 }
 
-@Composable
-fun HelloPreviewText() {
-    Text(
-        text = stringResource(id = R.string.hello_preview),
-        style = MaterialTheme.typography.headlineLarge
-    )
+// CORREGIR: Eliminar el duplicado
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object LevelSelection : Screen("level_selection")
+    object Parents : Screen("parents")
+    object Progress : Screen("progress")
+    object Consejos : Screen("consejos")
+    object AdjustTime : Screen("adjust_time")
+
+    // NUEVAS PANTALLAS DE NIVELES
+    object GuessTheVegetable : Screen("guess_the_vegetable")
+    object SmoothieMaker : Screen("smoothie_maker")
+    object Memorama : Screen("memorama")
+    object ClassifyMock : Screen("classify_mock")
+    object ArmaTuPlato : Screen("arma_tu_plato")
 }
 
-@Preview(
-    showBackground = true,
-    name = "Material3 Preview - Light",
-    device = "spec:width=411dp,height=891dp,dpi=420"
-)
 @Composable
-private fun HelloPreviewLight() {
-    AppTheme(darkTheme = false) {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            HelloPreviewText()
+fun AppNavGraph(navController: NavHostController = rememberNavController()) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route
+    ) {
+        composable(Screen.Home.route) {
+            HomeScreen(
+                onPlayClick = {
+                    println("NAVIGATION: Navegando a LevelSelection")
+                    navController.navigate(Screen.LevelSelection.route)
+                },
+                onParentsClick = {
+                    println("NAVIGATION: Navegando a Parents")
+                    navController.navigate(Screen.Parents.route)
+                }
+            )
         }
-    }
-}
 
-@Preview(
-    showBackground = true,
-    name = "Material3 Preview - Dark",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    device = "spec:width=360dp,height=640dp,dpi=320"
-)
-@Composable
-private fun HelloPreviewDark() {
-    AppTheme(darkTheme = true) {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            HelloPreviewText()
+        composable(Screen.LevelSelection.route) {
+            LevelSelectionScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Home")
+                    navController.popBackStack()
+                },
+                onLevelSelected = { levelId ->
+                    println("NAVIGATION: Nivel $levelId seleccionado")
+                    // Navegar a la pantalla correspondiente según el nivel
+                    when (levelId) {
+                        1 -> navController.navigate(Screen.GuessTheVegetable.route)
+                        2 -> navController.navigate(Screen.SmoothieMaker.route)
+                        3 -> navController.navigate(Screen.Memorama.route)
+                        4 -> navController.navigate(Screen.ClassifyMock.route)
+                        5 -> navController.navigate(Screen.ArmaTuPlato.route)
+                    }
+                }
+            )
+        }
+
+        composable(Screen.Parents.route) {
+            ParentsScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Home desde Parents")
+                    navController.popBackStack()
+                },
+                onProgressClick = {
+                    println("NAVIGATION: Navegando a ProgressScreen")
+                    navController.navigate(Screen.Progress.route)
+                },
+                onTipsClick = {
+                    println("NAVIGATION: Navegando a ConsejosScreen")
+                    navController.navigate(Screen.Consejos.route)
+                },
+                onTimeClick = {
+                    println("NAVIGATION: Navegando a AdjustTimeScreen")
+                    navController.navigate(Screen.AdjustTime.route)
+                }
+            )
+        }
+
+        composable(Screen.Progress.route) {
+            ProgressScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Parents desde Progress")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Consejos.route) {
+            ConsejosScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Parents desde Consejos")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.AdjustTime.route) {
+            AdjustTimeScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Parents desde AdjustTime")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // NUEVAS PANTALLAS DE JUEGOS
+        composable(Screen.GuessTheVegetable.route) {
+            GuessTheVegetableScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a LevelSelection desde GuessTheVegetable")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.SmoothieMaker.route) {
+            SmoothieMakerScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a LevelSelection desde SmoothieMaker")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Memorama.route) {
+            MemoramaScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a LevelSelection desde Memorama")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.ClassifyMock.route) {
+            ClassifyMockScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a LevelSelection desde ClassifyMock")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.ArmaTuPlato.route) {
+            ArmaTuPlatoScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a LevelSelection desde ArmaTuPlato")
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

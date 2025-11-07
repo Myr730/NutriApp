@@ -17,9 +17,9 @@ import org.bamx.puebla.ui.theme.brand_orange_button
 import org.bamx.puebla.ui.theme.brand_purple_button
 
 @Composable
-fun PlayButton(modifier: Modifier = Modifier) {
+fun PlayButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(Dimens.homeButtonRadius),
         colors = ButtonDefaults.buttonColors(
             containerColor = brand_orange_button,
@@ -33,9 +33,9 @@ fun PlayButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ParentsButton(modifier: Modifier = Modifier) {
+fun ParentsButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(Dimens.homeButtonRadius),
         colors = ButtonDefaults.buttonColors(
             containerColor = brand_green_button,
@@ -49,9 +49,9 @@ fun ParentsButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SettingsButton(modifier: Modifier = Modifier) {
+fun SettingsButton(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     Button(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(Dimens.homeButtonRadius),
         colors = ButtonDefaults.buttonColors(
             containerColor = brand_purple_button,
