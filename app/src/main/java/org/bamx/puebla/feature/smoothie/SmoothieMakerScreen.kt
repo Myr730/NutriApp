@@ -3,6 +3,7 @@ package org.bamx.puebla.feature.smoothie
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,16 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
+import androidx.compose.foundation.layout.WindowInsets
 
-/**
- * UI estática para "¡Prepara el licuado!"
- * - Fondo + Nutri en UNA sola imagen (bg_smoothie)
- * - Botón de regreso arriba a la izquierda
- * - Cartel rojo + cápsula blanca con 3 ingredientes
- * - Fila de frutas centrada sobre la franja café
- */
 @Composable
 fun SmoothieMakerScreen(
+    onBackClick: () -> Unit = {}, // ← AGREGAR parámetro de navegación
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -41,20 +38,21 @@ fun SmoothieMakerScreen(
         // 1) Fondo (cocina + Nutri + licuadora)
         Image(
             painter = painterResource(id = R.drawable.bg_smoothie),
-            contentDescription = "Fondo de cocina con Nutri",
+            contentDescription = stringResource(R.string.cd_bg_smoothie),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
 
-        // 2) Botón de regreso (arriba-izquierda)
+        // 2) Botón de regreso (arriba-izquierda) - AGREGAR .clickable
         Image(
             painter = painterResource(id = R.drawable.ic_back2),
-            contentDescription = "Regresar",
+            contentDescription = stringResource(R.string.cd_back),
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(start = 12.dp, top = 12.dp)
-                .size(48.dp),
+                .size(48.dp)
+                .clickable { onBackClick() }, // ← AGREGAR navegación
             contentScale = ContentScale.Fit
         )
 
@@ -66,7 +64,7 @@ fun SmoothieMakerScreen(
                 .padding(top = 56.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TitleBanner(text = "¡PREPARA EL LICUADO!")
+            TitleBanner(text = stringResource(R.string.smoothie_title))
             Spacer(Modifier.height(10.dp))
             RequiredIngredientsCapsule(
                 ingredients = listOf(
@@ -80,11 +78,11 @@ fun SmoothieMakerScreen(
         // 4) Frutas disponibles (fila inferior) centradas con la franja café
         BottomFruitsRow(
             modifier = Modifier
-                .align(Alignment.BottomCenter)                         // centrado horizontal
+                .align(Alignment.BottomCenter)
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(vertical = 12.dp),                             // margen inferior
-            rowWidthFraction = 0.90f,                                   // <- ancho contenido para calzar con la franja
-            bottomPadding = 4.dp,                                       // ajústalo si quieres subir/bajar 1–2 dp
+                .padding(vertical = 12.dp),
+            rowWidthFraction = 0.90f,
+            bottomPadding = 4.dp,
             fruits = listOf(
                 R.drawable.food_grapes,
                 R.drawable.food_apple,
@@ -145,7 +143,7 @@ private fun RequiredIngredientsCapsule(
             ingredients.forEach { res ->
                 Image(
                     painter = painterResource(id = res),
-                    contentDescription = "Ingrediente requerido",
+                    contentDescription = stringResource(R.string.cd_required_ingredient),
                     modifier = Modifier.size(28.dp),
                     contentScale = ContentScale.Fit
                 )
@@ -154,11 +152,6 @@ private fun RequiredIngredientsCapsule(
     }
 }
 
-/**
- * Fila de frutas inferior centrada sobre la franja café del fondo.
- * - rowWidthFraction: controla cuán ancha es la fila (para que coincida con la “mesa”).
- * - bottomPadding: fino ajuste vertical si lo quieres subir/bajar 1–2 dp.
- */
 @Composable
 private fun BottomFruitsRow(
     fruits: List<Int>,
@@ -168,14 +161,21 @@ private fun BottomFruitsRow(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth(rowWidthFraction)                  // <- ancho recortado, centrado por el padre
+            .fillMaxWidth(rowWidthFraction)
             .padding(bottom = bottomPadding)
             .background(Color.Transparent),
-        horizontalArrangement = Arrangement.SpaceBetween,   // distribución dentro del ancho
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         fruits.forEach { res ->
-            FruitChip(resId = res)
+            FruitChip(
+                resId = res,
+                onClick = {
+                    // Lógica cuando se hace click en una fruta
+                    println("Fruta clickeada: $res")
+                    // Aquí podrías agregar la fruta a la licuadora
+                }
+            )
         }
     }
 }
@@ -183,16 +183,19 @@ private fun BottomFruitsRow(
 @Composable
 private fun FruitChip(
     resId: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {} // ← AGREGAR parámetro para el click
 ) {
     Surface(
         color = Color.Transparent,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier
+            .size(63.dp)
+            .clickable { onClick() } // ← Hacer las frutas clickeables
     ) {
         Image(
             painter = painterResource(id = resId),
-            contentDescription = "Fruta",
-            modifier = modifier.size(63.dp),
+            contentDescription = stringResource(R.string.cd_food_apple),
             contentScale = ContentScale.Fit
         )
     }
@@ -207,7 +210,11 @@ private fun FruitChip(
 )
 @Composable
 private fun PreviewSmoothieLight() {
-    AppTheme(darkTheme = false) { SmoothieMakerScreen() }
+    AppTheme(darkTheme = false) {
+        SmoothieMakerScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }
 
 @Preview(
@@ -218,5 +225,9 @@ private fun PreviewSmoothieLight() {
 )
 @Composable
 private fun PreviewSmoothieDark() {
-    AppTheme(darkTheme = true) { SmoothieMakerScreen() }
+    AppTheme(darkTheme = true) {
+        SmoothieMakerScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }

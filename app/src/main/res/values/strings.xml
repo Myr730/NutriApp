@@ -126,6 +126,8 @@
     <string name="btn_parents">PADRES</string>
     <string name="btn_settings">AJUSTES</string>
 
+
+
     <!-- Padres -->
     <string name="parents_progress">PROGRESO</string>
     <string name="parents_weight_height">PESO/TALLA</string>

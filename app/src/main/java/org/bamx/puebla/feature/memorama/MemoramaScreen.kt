@@ -3,6 +3,7 @@ package org.bamx.puebla.feature.memorama
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,9 +33,16 @@ import org.bamx.puebla.ui.theme.Dimens.memoramaCardCorner
 import org.bamx.puebla.ui.theme.Dimens.memoramaGridHSpace
 import org.bamx.puebla.ui.theme.Dimens.memoramaGridVSpace
 import org.bamx.puebla.ui.theme.timeout_header_green
+import androidx.compose.foundation.layout.WindowInsets
 
 @Composable
-fun MemoramaScreen() {
+fun MemoramaScreen(
+    onBackClick: () -> Unit = {} // ← AGREGAR parámetro de navegación
+) {
+    // AGREGAR: Detectar si es pantalla pequeña
+    val configuration = LocalConfiguration.current
+    val isSmall = configuration.screenWidthDp <= 360
+
     AppScaffold(
         backgroundResId = R.drawable.bg_memorama,
         darkenBackground = 0f,
@@ -43,7 +52,10 @@ fun MemoramaScreen() {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TopBarMemorama()
+            TopBarMemorama(
+                onBackClick = onBackClick, // ← PASAR el parámetro
+                isSmall = isSmall // ← PASAR el tamaño
+            )
 
             Spacer(Modifier.height(20.dp))
 
@@ -56,7 +68,10 @@ fun MemoramaScreen() {
 }
 
 @Composable
-private fun TopBarMemorama() {
+private fun TopBarMemorama(
+    onBackClick: () -> Unit, // ← AGREGAR parámetro
+    isSmall: Boolean // ← AGREGAR parámetro
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,19 +84,23 @@ private fun TopBarMemorama() {
             modifier = Modifier.align(Alignment.Center)
         )
         Image(
-            painter = painterResource(id = R.drawable.ic_pause),
-            contentDescription = stringResource(id = R.string.cd_pause),
+            painter = painterResource(id = R.drawable.ic_back2),
+            contentDescription = stringResource(id = R.string.cd_back),
             modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 12.dp)
-                .size(52.dp),
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp, top = 12.dp)
+                .size(if (isSmall) 44.dp else 52.dp)
+                .clickable {
+                    println("DEBUG: Botón regresar MemoramaScreen clickeado")
+                    onBackClick()
+                }, // ← USAR el parámetro
             contentScale = ContentScale.Fit
         )
     }
 }
 
 @Composable
-@Suppress("UnusedBoxWithConstraintsScope") // Se suprime el falso positivo del IDE
+@Suppress("UnusedBoxWithConstraintsScope")
 private fun MemoramaGridContainer() {
     val cardAspectRatio = 0.68f
     val columns = 3
@@ -127,11 +146,16 @@ private fun MemoramaGridContainer() {
                 ),
                 userScrollEnabled = false
             ) {
-                items(items) {
+                items(items) { index ->
                     MemoramaCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(cardAspectRatio)
+                            .clickable {
+                                // Lógica cuando se hace click en una carta
+                                println("Carta clickeada: $index")
+                                // Aquí iría la lógica del juego de memoria
+                            }
                     )
                 }
             }
@@ -146,7 +170,7 @@ private fun TitleBanner(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth(0.88f) // El ancho ahora es una propiedad interna
+            .fillMaxWidth(0.88f)
             .clip(RoundedCornerShape(20.dp))
             .background(timeout_header_green)
             .padding(horizontal = 18.dp, vertical = 10.dp),
@@ -166,9 +190,13 @@ private fun TitleBanner(
 }
 
 @Composable
-private fun MemoramaCard(modifier: Modifier = Modifier) {
+private fun MemoramaCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {} // ← AGREGAR parámetro para el click
+) {
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .clickable { onClick() }, // ← Hacer la carta clickeable
         contentAlignment = Alignment.Center
     ) {
         Image(
@@ -188,6 +216,8 @@ private fun MemoramaCard(modifier: Modifier = Modifier) {
     }
 }
 
+/* ---------- PREVIEWS ---------- */
+
 @Preview(
     name = "Memorama - 411x891 Light",
     showBackground = true,
@@ -196,7 +226,11 @@ private fun MemoramaCard(modifier: Modifier = Modifier) {
 )
 @Composable
 private fun PreviewMemoramaLight() {
-    AppTheme(darkTheme = false) { MemoramaScreen() }
+    AppTheme(darkTheme = false) {
+        MemoramaScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }
 
 @Preview(
@@ -208,5 +242,9 @@ private fun PreviewMemoramaLight() {
 )
 @Composable
 private fun PreviewMemoramaDark() {
-    AppTheme(darkTheme = true) { MemoramaScreen() }
+    AppTheme(darkTheme = true) {
+        MemoramaScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }

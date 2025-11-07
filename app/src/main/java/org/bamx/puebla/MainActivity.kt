@@ -9,15 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.bamx.puebla.feature.armatuplato.ArmaTuPlatoScreen
-import org.bamx.puebla.feature.classifymock.ClassifyMockScreen
-import org.bamx.puebla.feature.consejos.ConsejosScreen
-import org.bamx.puebla.feature.guessthevegetable.GuessTheVegetableScreen
+import org.bamx.puebla.feature.game.ClassifyMockScreen
+import org.bamx.puebla.feature.guess.GuessTheVegetableScreen
 import org.bamx.puebla.feature.home.HomeScreen
 import org.bamx.puebla.feature.levelselection.LevelSelectionScreen
 import org.bamx.puebla.feature.memorama.MemoramaScreen
 import org.bamx.puebla.feature.parents.ParentsScreen
 import org.bamx.puebla.feature.progress.ProgressScreen
-import org.bamx.puebla.feature.smoothiemaker.SmoothieMakerScreen
+import org.bamx.puebla.feature.smoothie.SmoothieMakerScreen
 import org.bamx.puebla.feature.timeout.AdjustTimeScreen
 import org.bamx.puebla.ui.theme.AppTheme
 
@@ -118,14 +117,6 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        composable(Screen.Consejos.route) {
-            ConsejosScreen(
-                onBackClick = {
-                    println("NAVIGATION: Regresando a Parents desde Consejos")
-                    navController.popBackStack()
-                }
-            )
-        }
 
         composable(Screen.AdjustTime.route) {
             AdjustTimeScreen(

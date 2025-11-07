@@ -2,7 +2,7 @@ package org.bamx.puebla.feature.armatuplato
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -29,11 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalConfiguration
+
 
 @Composable
 fun ArmaTuPlatoScreen(
     modifier: Modifier = Modifier,
     centerIngredientRes: Int = R.drawable.food_broccoli,
+    onBackClick: () -> Unit = {} // ← AGREGAR ESTE PARÁMETRO
 ) {
     Box(
         modifier = modifier.fillMaxSize()
@@ -49,7 +52,7 @@ fun ArmaTuPlatoScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ArmaPlatoTopBar()
+            ArmaPlatoTopBar(onBackClick) // ← Pasar el callback al TopBar
 
             Box(
                 modifier = Modifier
@@ -75,12 +78,10 @@ fun ArmaTuPlatoScreen(
 }
 
 
-/* -------------------------------------------------------------------------- */
-/* Secciones de la UI                                                        */
-/* -------------------------------------------------------------------------- */
-
 @Composable
-private fun ArmaPlatoTopBar() {
+private fun ArmaPlatoTopBar(onBackClick: () -> Unit) {
+    val configuration = LocalConfiguration.current
+    val isSmall = configuration.screenWidthDp <= 360
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,12 +94,14 @@ private fun ArmaPlatoTopBar() {
             modifier = Modifier.align(Alignment.Center)
         )
         Image(
-            painter = painterResource(id = R.drawable.ic_pause),
-            contentDescription = stringResource(id = R.string.cd_pause),
-            contentScale = ContentScale.Fit,
+            painter = painterResource(id = R.drawable.ic_back2),
+            contentDescription = stringResource(id = R.string.cd_back),
             modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(52.dp)
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp, top = 12.dp)
+                .size(if (isSmall) 44.dp else 52.dp)
+                .clickable { onBackClick() },
+            contentScale = ContentScale.Fit
         )
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,17 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.WindowInsets
+import android.annotation.SuppressLint
 
 @Composable
 fun GuessTheVegetableScreen(
-    onBackClick: () -> Unit = {}
-    modifier: Modifier = Modifier,
-    title: String = stringResource(id = R.string.guess_title), // “¡ADIVINA LA VERDURA!”
+    onBackClick: () -> Unit = {}, // ← MOVER este parámetro primero
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    title: String = stringResource(id = R.string.guess_title), // "¡ADIVINA LA VERDURA!"
     wordPlaceholders: String = "_  _  _  _  _",
-    @DrawableRes backgroundRes: Int = R.drawable.bg_guess,           // fondo exterior
+    @DrawableRes backgroundRes: Int = R.drawable.bg_guess, // fondo exterior
     @DrawableRes characterRes: Int = R.drawable.nutri_guess
-
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Fondo
@@ -44,17 +45,6 @@ fun GuessTheVegetableScreen(
             contentDescription = stringResource(id = R.string.cd_background),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
-        )
-        // Botón de regresar
-        Image(
-            painter = painterResource(id = R.drawable.ic_back2),
-            contentDescription = stringResource(id = R.string.cd_back),
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 12.dp, top = 12.dp)
-                .size(52.dp)
-                .clickable { onBackClick() },
-            contentScale = ContentScale.Fit
         )
 
         Column(
@@ -70,13 +60,15 @@ fun GuessTheVegetableScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                // Botón de regresar - CORREGIDO
                 Image(
-                    painter = painterResource(id = backRes),
-                    contentDescription = stringResource(id = R.string.cd_pause),
+                    painter = painterResource(id = R.drawable.ic_back2), // ← USAR ic_back2
+                    contentDescription = stringResource(id = R.string.cd_back),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .size(48.dp)
+                        .clickable { onBackClick() } // ← AGREGAR click aquí
                 )
 
                 TitleBanner(
@@ -170,7 +162,11 @@ private fun KeyboardGrid(
             Surface(
                 color = Color(0xFF74B86A), // verde amable
                 shape = RoundedCornerShape(8.dp),
-                shadowElevation = 6.dp
+                shadowElevation = 6.dp,
+                modifier = Modifier.clickable {
+                    // Aquí iría la lógica para manejar la letra clickeada
+                    println("Letra clickeada: $key")
+                }
             ) {
                 Box(
                     modifier = Modifier
@@ -200,7 +196,11 @@ private fun KeyboardGrid(
 )
 @Composable
 private fun PreviewGuessLight() {
-    AppTheme(darkTheme = false) { GuessTheVegetableScreen() }
+    AppTheme(darkTheme = false) {
+        GuessTheVegetableScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }
 
 @Preview(
@@ -211,5 +211,9 @@ private fun PreviewGuessLight() {
 )
 @Composable
 private fun PreviewGuessDark() {
-    AppTheme(darkTheme = true) { GuessTheVegetableScreen() }
+    AppTheme(darkTheme = true) {
+        GuessTheVegetableScreen(
+            onBackClick = {} // ← AGREGAR para el preview
+        )
+    }
 }

@@ -3,6 +3,7 @@ package org.bamx.puebla.feature.game
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.offset
@@ -15,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -32,13 +34,19 @@ import org.bamx.puebla.R
 import org.bamx.puebla.ui.responsive.rememberUiMetrics
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.Dimens
+import androidx.compose.foundation.layout.WindowInsets
 
 @Composable
 fun ClassifyMockScreen(
+    onBackClick: () -> Unit = {}, // ← AGREGAR parámetro de navegación
     showSuccessPanel: Boolean = true,
     @DrawableRes currentFoodRes: Int = R.drawable.food_apple,
 ) {
-    val m = rememberUiMetrics() // <- centraliza tamaños por clase de pantalla
+    val m = rememberUiMetrics()
+
+    // AGREGAR: Detectar si es pantalla pequeña
+    val configuration = LocalConfiguration.current
+    val isSmall = configuration.screenWidthDp <= 360
 
     val signWidthFraction = m.gameSignWidthFraction
     val titleFontSize = m.gameTitleFontSizeSp.sp
@@ -46,7 +54,6 @@ fun ClassifyMockScreen(
     val fruitWidth = (m.screenWidthDp * m.gameFruitWidthFraction).dp
     val successWidthFraction = m.gameSuccessWidthFraction
 
-    // Canastas grandes (puedes afinar m.gameBasketHeightFraction en UiMetrics.kt)
     val basketHeight: Dp = (m.screenWidthDp * m.gameBasketHeightFraction).dp
     val bottomPadding = if (m.sizeClass == org.bamx.puebla.ui.responsive.SizeClass.Small) 8.dp else 10.dp
 
@@ -60,15 +67,19 @@ fun ClassifyMockScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Pausa arriba-izquierda
+        // Botón de regresar - CORREGIDO
         Image(
-            painter = painterResource(id = R.drawable.ic_pause),
-            contentDescription = stringResource(id = R.string.cd_pause),
+            painter = painterResource(id = R.drawable.ic_back2),
+            contentDescription = stringResource(id = R.string.cd_back),
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 24.dp, top = 24.dp)
-                .size(if (m.sizeClass == org.bamx.puebla.ui.responsive.SizeClass.Small) 44.dp else 52.dp)
-                .semantics { role = Role.Button },
+                .windowInsetsPadding(WindowInsets.statusBars) // ← AGREGAR este padding
+                .padding(start = 12.dp, top = 12.dp)
+                .size(if (isSmall) 44.dp else 52.dp)
+                .clickable {
+                    println("DEBUG: Botón regresar ClassifyMockScreen clickeado")
+                    onBackClick()
+                }, // ← USAR el parámetro
             contentScale = ContentScale.Fit
         )
 
@@ -93,7 +104,7 @@ fun ClassifyMockScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.classify_title_multiline), // "CLASIFICA\nEL ALIMENTO"
+                    text = stringResource(id = R.string.classify_title_multiline),
                     color = Color.White,
                     maxLines = 2,
                     overflow = TextOverflow.Clip,
@@ -210,7 +221,12 @@ fun ClassifyMockScreen(
 
 /** RowScope para poder usar .weight(1f) en cada canasta */
 @Composable
-private fun RowScope.Basket(label: String, resId: Int, height: Dp) {
+private fun RowScope.Basket(
+    label: String,
+    resId: Int,
+    height: Dp,
+    onClick: () -> Unit = {} // ← OPCIONAL: Hacer las canastas clickeables
+) {
     Box(
         modifier = Modifier
             .weight(1f)
@@ -219,6 +235,7 @@ private fun RowScope.Basket(label: String, resId: Int, height: Dp) {
                 role = Role.Button
                 stateDescription = label
             }
+            .clickable { onClick() } // ← OPCIONAL: Hacer clickeable
     ) {
         Image(
             painter = painterResource(id = resId),
@@ -252,6 +269,7 @@ private fun RowScope.Basket(label: String, resId: Int, height: Dp) {
         )
     }
 }
+
 
 /* ---------- PREVIEWS ---------- */
 
