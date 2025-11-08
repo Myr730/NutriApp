@@ -35,7 +35,7 @@ val vegetableList = listOf(
     "TOMATE",
     "LECHUGA",
     "CEBOLLA",
-    "PAPA",
+    "REPOLLO",
     "BROCOLI",
     "ESPINACA",
     "PEPINO",

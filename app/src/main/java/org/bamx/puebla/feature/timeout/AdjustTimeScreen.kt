@@ -29,25 +29,21 @@ import org.bamx.puebla.ui.theme.parents_bg_top
 
 @Composable
 fun AdjustTimeScreen(
-    onBackClick: () -> Unit = {}, // ← AGREGAR este parámetro
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
 ) {
     // Estados para los tiempos
     var gameTimeMinutes by remember { mutableIntStateOf(15) }
     var breakTimeSeconds by remember { mutableIntStateOf(30) }
 
-    val screenW = LocalConfiguration.current.screenWidthDp
-    val isSmall = screenW <= 360
-
-
-    val backgroundBrush = Brush.verticalGradient(
-        colors = listOf(parents_bg_top, parents_bg_bottom)
-    )
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(backgroundBrush)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(parents_bg_top, parents_bg_bottom)
+                )
+            )
     ) {
         Column(
             modifier = Modifier
@@ -55,10 +51,8 @@ fun AdjustTimeScreen(
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 1. BARRA SUPERIOR ESTRUCTURADA
-            AdjustTimeTopBar(
-                onBackClick = onBackClick // ← Pasar el parámetro aquí
-            )
+            // BARRA SUPERIOR
+            AdjustTimeTopBar(onBackClick = onBackClick)
 
             Spacer(Modifier.height(24.dp))
 
@@ -104,24 +98,18 @@ fun AdjustTimeScreen(
                     // Aquí guardarías las configuraciones
                     println("Tiempo de juego guardado: $gameTimeMinutes minutos")
                     println("Tiempo de pausa guardado: $breakTimeSeconds segundos")
-                    // Opcional: regresar automáticamente
-                    // onBackClick()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.navigationBars),
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(18.dp)
             ) {
                 Text(
                     text = stringResource(R.string.time_save_button),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.ExtraBold
                     ),
-                    modifier = Modifier.padding(vertical = 10.dp)
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
             }
 
@@ -130,21 +118,15 @@ fun AdjustTimeScreen(
     }
 }
 
-/**
- * Barra superior que contiene el botón de regreso y el título
- */
 @Composable
 private fun AdjustTimeTopBar(
-    onBackClick: () -> Unit // ← Recibir el parámetro
+    onBackClick: () -> Unit
 ) {
-    val screenW = LocalConfiguration.current.screenWidthDp
-    val isSmall = screenW <= 360
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .heightIn(min = 56.dp)
+            .padding(top = 24.dp)
+            .height(56.dp)
     ) {
         // Título centrado
         TitleBanner(
@@ -153,18 +135,15 @@ private fun AdjustTimeTopBar(
                 .align(Alignment.Center)
                 .fillMaxWidth(0.8f)
         )
+
         // Botón de regreso a la izquierda
         Image(
             painter = painterResource(id = R.drawable.ic_back2),
             contentDescription = stringResource(id = R.string.cd_back),
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 0.dp, top = 24.dp)
-                .size(if (isSmall) 44.dp else 52.dp)
-                .clickable {
-                    println("DEBUG: Botón regresar ParentsScreen clickeado")
-                    onBackClick()
-                },
+                .align(Alignment.CenterStart)
+                .size(52.dp)
+                .clickable { onBackClick() },
             contentScale = ContentScale.Fit
         )
     }
@@ -178,18 +157,16 @@ private fun TitleBanner(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(90.dp),
-        color = MaterialTheme.colorScheme.error.copy(alpha = 0.95f) // ← Usar el color del tema
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.95f)
     ) {
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp,
-                lineHeight = 24.sp
+                fontWeight = FontWeight.ExtraBold
             ),
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
         )
     }
 }
@@ -202,43 +179,51 @@ private fun TimeCard(
     minusCd: String,
     plusCd: String,
     modifier: Modifier = Modifier,
-    onMinusClick: () -> Unit = {}, // ← Nuevos parámetros para los clicks
+    onMinusClick: () -> Unit = {},
     onPlusClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(4.dp))
+
+            Spacer(Modifier.height(8.dp))
+
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                )
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(14.dp))
 
+            Spacer(Modifier.height(16.dp))
+
+            // Controles de tiempo
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                PillIcon(
+                TimeControlButton(
                     text = "–",
-                    cd = minusCd,
-                    onClick = onMinusClick // ← Pasar el click
+                    contentDescription = minusCd,
+                    onClick = onMinusClick
                 )
 
                 Text(
@@ -249,10 +234,10 @@ private fun TimeCard(
                     )
                 )
 
-                PillIcon(
+                TimeControlButton(
                     text = "+",
-                    cd = plusCd,
-                    onClick = onPlusClick // ← Pasar el click
+                    contentDescription = plusCd,
+                    onClick = onPlusClick
                 )
             }
         }
@@ -260,23 +245,22 @@ private fun TimeCard(
 }
 
 @Composable
-private fun PillIcon(
+private fun TimeControlButton(
     text: String,
-    cd: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {} // ← Nuevo parámetro para el click
+    contentDescription: String,
+    onClick: () -> Unit
 ) {
     Box(
-        modifier = modifier
-            .size(46.dp)
+        modifier = Modifier
+            .size(48.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primary)
-            .clickable { onClick() }, // ← Usar el parámetro aquí
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleLarge.copy(
+            style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -287,30 +271,42 @@ private fun PillIcon(
 /* ---------- PREVIEWS ---------- */
 
 @Preview(
-    name = "AdjustTime - 411x891 Light",
+    name = "AdjustTime - Light",
     showBackground = true,
-    device = "spec:width=411dp,height=891dp,dpi=420"
+    widthDp = 411,
+    heightDp = 891
 )
 @Composable
 private fun PreviewAdjustTimeLight() {
     AppTheme(darkTheme = false) {
-        AdjustTimeScreen(
-            onBackClick = {} // ← Agregar para el preview
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = parents_bg_top
+        ) {
+            AdjustTimeScreen(
+                onBackClick = {}
+            )
+        }
     }
 }
 
 @Preview(
-    name = "AdjustTime - 360x640 Dark",
+    name = "AdjustTime - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
-    device = "spec:width=360dp,height=640dp,dpi=320"
+    widthDp = 360,
+    heightDp = 640
 )
 @Composable
 private fun PreviewAdjustTimeDark() {
     AppTheme(darkTheme = true) {
-        AdjustTimeScreen(
-            onBackClick = {} // ← Agregar para el preview
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = parents_bg_top
+        ) {
+            AdjustTimeScreen(
+                onBackClick = {}
+            )
+        }
     }
 }

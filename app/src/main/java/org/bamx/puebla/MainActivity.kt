@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.bamx.puebla.feature.armatuplato.ArmaTuPlatoScreen
-import org.bamx.puebla.feature.game.ClassifyMockScreen
+import org.bamx.puebla.feature.game.ClassifyGameScreen
 import org.bamx.puebla.feature.guess.GuessTheVegetableScreen
 import org.bamx.puebla.feature.home.HomeScreen
 import org.bamx.puebla.feature.levelselection.LevelSelectionScreen
@@ -44,7 +44,8 @@ sealed class Screen(val route: String) {
     object GuessTheVegetable : Screen("guess_the_vegetable")
     object SmoothieMaker : Screen("smoothie_maker")
     object Memorama : Screen("memorama")
-    object ClassifyMock : Screen("classify_mock")
+
+    object ClassifyGame : Screen("classify_game")
     object ArmaTuPlato : Screen("arma_tu_plato")
 }
 
@@ -80,7 +81,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                         1 -> navController.navigate(Screen.GuessTheVegetable.route)
                         2 -> navController.navigate(Screen.SmoothieMaker.route)
                         3 -> navController.navigate(Screen.Memorama.route)
-                        4 -> navController.navigate(Screen.ClassifyMock.route)
+                        4 -> navController.navigate(Screen.ClassifyGame.route)
                         5 -> navController.navigate(Screen.ArmaTuPlato.route)
                     }
                 }
@@ -155,8 +156,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        composable(Screen.ClassifyMock.route) {
-            ClassifyMockScreen(
+        composable(Screen.ClassifyGame.route) {
+            ClassifyGameScreen(
                 onBackClick = {
                     println("NAVIGATION: Regresando a LevelSelection desde ClassifyMock")
                     navController.popBackStack()
