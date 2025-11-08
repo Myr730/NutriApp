@@ -143,8 +143,8 @@ private fun initializeGame(gameState: GameState) {
         R.drawable.cereales,
         R.drawable.tuberculos,
         R.drawable.leguminosas,
-        R.drawable.leguminosas2,
-        R.drawable.tuber1
+        R.drawable.cereales2,
+        R.drawable.granos2
     )
 
     // Crear pares de cartas
