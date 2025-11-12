@@ -1,6 +1,7 @@
 package org.bamx.puebla.feature.progress
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.bamx.puebla.R
 import org.bamx.puebla.ui.theme.AppTheme
@@ -39,9 +42,19 @@ fun ProgressScreen(
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val repository = remember { org.bamx.puebla.AppDatabase.getRepository(context) }
-    val viewModel = remember { ProgressViewModel(repository) }
 
+    // Inicialización segura fuera del composable
+    val repository = remember {
+        runCatching {
+            org.bamx.puebla.AppDatabase.getRepository(context)
+        }.getOrNull().also { repo ->
+            if (repo == null) {
+                Log.e("ProgressScreen", "No se pudo inicializar la base de datos")
+            }
+        }
+    }
+
+    val viewModel = remember { ProgressViewModel(repository) }
     val weightProgressList by viewModel.weightProgressList.collectAsState(initial = emptyList())
 
     ProgressScreenContent(
@@ -49,30 +62,53 @@ fun ProgressScreen(
         weightProgressList = weightProgressList,
         onAddWeightClick = { name, weight, date ->
             viewModel.addWeightProgress(name, weight, date)
-        }
+        },
+        hasDatabaseError = repository == null
     )
 }
 
-// ViewModel actualizado para incluir nombre
-class ProgressViewModel(private val repository: org.bamx.puebla.WeightProgressRepository) {
+// ViewModel corregido - Sin GlobalScope
+class ProgressViewModel(private val repository: org.bamx.puebla.WeightProgressRepository?) {
 
-    val weightProgressList = repository.getAllWeightProgress()
+    val weightProgressList = repository?.getAllWeightProgress() ?: kotlinx.coroutines.flow.flowOf(emptyList())
 
     fun addWeightProgress(name: String, weight: Double, date: Date = Date()) {
-        kotlinx.coroutines.GlobalScope.launch {
-            repository.addWeightProgress(name, weight, date)
+        if (repository == null) {
+            Log.e("ProgressViewModel", "Repository es null, no se puede guardar")
+            return
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                repository.addWeightProgress(name, weight, date)
+                Log.d("ProgressViewModel", "Peso guardado exitosamente: $name, $weight")
+            } catch (e: Exception) {
+                Log.e("ProgressViewModel", "Error guardando peso: ${e.message}")
+            }
         }
     }
 
     fun updateWeightProgress(weightProgress: org.bamx.puebla.WeightProgress) {
-        kotlinx.coroutines.GlobalScope.launch {
-            repository.updateWeightProgress(weightProgress)
+        if (repository == null) return
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                repository.updateWeightProgress(weightProgress)
+            } catch (e: Exception) {
+                Log.e("ProgressViewModel", "Error actualizando peso: ${e.message}")
+            }
         }
     }
 
     fun deleteWeightProgress(weightProgress: org.bamx.puebla.WeightProgress) {
-        kotlinx.coroutines.GlobalScope.launch {
-            repository.deleteWeightProgress(weightProgress)
+        if (repository == null) return
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                repository.deleteWeightProgress(weightProgress)
+            } catch (e: Exception) {
+                Log.e("ProgressViewModel", "Error eliminando peso: ${e.message}")
+            }
         }
     }
 }
@@ -109,8 +145,8 @@ fun AddWeightDialog(
                 OutlinedTextField(
                     value = weightInput,
                     onValueChange = { newValue ->
-                        // Validación manual para solo permitir números y punto decimal
-                        if (newValue.matches(Regex("[0-9.]*"))) {
+                        // Validación mejorada
+                        if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
                             weightInput = newValue
                         }
                     },
@@ -121,7 +157,7 @@ fun AddWeightDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Información de fecha (podrías agregar un selector de fecha aquí)
+                // Información de fecha
                 Text(
                     text = "Fecha: ${java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)}",
                     style = MaterialTheme.typography.bodySmall,
@@ -141,7 +177,7 @@ fun AddWeightDialog(
             Button(
                 onClick = {
                     val weight = weightInput.toDoubleOrNull()
-                    if (nameInput.isNotEmpty() && weight != null) {
+                    if (nameInput.isNotEmpty() && weight != null && weight > 0) {
                         onConfirm(nameInput, weight, selectedDate)
                         onDismiss()
                     }
@@ -163,7 +199,8 @@ fun AddWeightDialog(
 fun ProgressScreenContent(
     onBackClick: () -> Unit = {},
     weightProgressList: List<org.bamx.puebla.WeightProgress> = emptyList(),
-    onAddWeightClick: (String, Double, Date) -> Unit = { _, _, _ -> }
+    onAddWeightClick: (String, Double, Date) -> Unit = { _, _, _ -> },
+    hasDatabaseError: Boolean = false
 ) {
     var showAddWeightDialog by remember { mutableStateOf(false) }
     val screenW = LocalConfiguration.current.screenWidthDp
@@ -177,7 +214,6 @@ fun ProgressScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(horizontal = Dimens.screenPadding)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -192,14 +228,34 @@ fun ProgressScreenContent(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFF1E1B16),
-                    fontSize = 32.sp,
-                    lineHeight = 36.sp
+                    fontSize = 32.sp
                 )
             )
 
             Spacer(Modifier.height(18.dp))
 
-            // Tarjeta HISTORIAL COMPLETO - Ahora con nombre, fecha y peso
+            // Mostrar error de base de datos si existe
+            if (hasDatabaseError) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEDED))
+                ) {
+                    Text(
+                        text = "Error: No se pudo cargar la base de datos",
+                        color = Color(0xFFD32F2F),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+
+            // Tarjeta HISTORIAL COMPLETO
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(22.dp),
@@ -262,7 +318,11 @@ fun ProgressScreenContent(
 
                     if (weightProgressList.isEmpty()) {
                         Text(
-                            text = "No hay registros de progreso\nToca el botón + para agregar uno",
+                            text = if (hasDatabaseError) {
+                                "Base de datos no disponible"
+                            } else {
+                                "No hay registros de progreso\nToca el botón + para agregar uno"
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 40.dp),
@@ -273,12 +333,24 @@ fun ProgressScreenContent(
                         )
                     } else {
                         weightProgressList.forEach { weightProgress ->
-                            val dateFormatted = org.bamx.puebla.DatabaseHelper.formatDate(weightProgress.date)
-                            val weightFormatted = org.bamx.puebla.DatabaseHelper.formatWeight(weightProgress.weight)
-                            val bgColor = Color(org.bamx.puebla.DatabaseHelper.getBackgroundColorForWeight(weightProgress, weightProgressList))
+                            val dateFormatted = try {
+                                org.bamx.puebla.DatabaseHelper.formatDate(weightProgress.date)
+                            } catch (e: Exception) {
+                                "Fecha inválida"
+                            }
+                            val weightFormatted = try {
+                                org.bamx.puebla.DatabaseHelper.formatWeight(weightProgress.weight)
+                            } catch (e: Exception) {
+                                "0.0"
+                            }
+                            val bgColor = try {
+                                Color(org.bamx.puebla.DatabaseHelper.getBackgroundColorForWeight(weightProgress, weightProgressList))
+                            } catch (e: Exception) {
+                                Color(0xFFE8F7EA)
+                            }
 
                             ProgressRow(
-                                name = weightProgress.notes, // Usamos notes para almacenar el nombre
+                                name = weightProgress.notes.takeIf { it.isNotEmpty() } ?: "Sin nombre",
                                 date = dateFormatted,
                                 weight = weightFormatted,
                                 bg = bgColor
@@ -290,27 +362,29 @@ fun ProgressScreenContent(
             }
 
             Spacer(Modifier.height(110.dp))
-            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
         }
 
-        // Botón de regresar
+        // Botón de regresar - simplificado
         Image(
             painter = painterResource(id = R.drawable.ic_back2),
             contentDescription = stringResource(id = R.string.cd_back),
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(start = 12.dp, top = 12.dp)
-                .size(if (isSmall) 44.dp else 52.dp)
+                .size(52.dp)
                 .clickable { onBackClick() },
             contentScale = ContentScale.Fit
         )
 
         // FAB para agregar registro
         FloatingActionButton(
-            onClick = { showAddWeightDialog = true },
+            onClick = {
+                if (!hasDatabaseError) {
+                    showAddWeightDialog = true
+                }
+            },
             shape = RoundedCornerShape(30.dp),
-            containerColor = Color(0xFFFF8A3D),
+            containerColor = if (hasDatabaseError) Color.Gray else Color(0xFFFF8A3D),
             contentColor = Color.White,
             modifier = Modifier
                 .align(Alignment.BottomEnd)

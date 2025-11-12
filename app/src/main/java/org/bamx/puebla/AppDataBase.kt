@@ -91,6 +91,7 @@ class WeightProgressRepository(private val dao: WeightProgressDao) {
 }
 
 // 5. Database
+// En AppDatabase.kt - Versión simplificada y segura
 @Database(
     entities = [WeightProgress::class],
     version = 1,
@@ -98,80 +99,24 @@ class WeightProgressRepository(private val dao: WeightProgressDao) {
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun weightProgressDao(): WeightProgressDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
-        private const val DATABASE_NAME = "app_database"
-
-        // Ejecutor para operaciones en background
-        private val executor = Executors.newSingleThreadExecutor()
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    DATABASE_NAME
-                )
-                    .addCallback(object : RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // Insertar datos de ejemplo al crear la base de datos
-                            CoroutineScope(Dispatchers.IO).launch {
-                                getInstance(context).weightProgressDao().apply {
-                                    // Datos de ejemplo
-                                    val calendar = Calendar.getInstance()
-
-                                    calendar.add(Calendar.DAY_OF_YEAR, -3)
-                                    insertWeightProgress(
-                                        WeightProgress(
-                                            weight = 58.0,
-                                            date = calendar.time
-                                        )
-                                    )
-
-                                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                                    insertWeightProgress(
-                                        WeightProgress(
-                                            weight = 58.5,
-                                            date = calendar.time
-                                        )
-                                    )
-
-                                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                                    insertWeightProgress(
-                                        WeightProgress(
-                                            weight = 58.9,
-                                            date = calendar.time
-                                        )
-                                    )
-
-                                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                                    insertWeightProgress(
-                                        WeightProgress(
-                                            weight = 59.5,
-                                            date = calendar.time
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    })
-                    .build()
+                    "app_database"
+                ).build()
                 INSTANCE = instance
                 instance
             }
         }
 
-        // Para testing
-        fun destroyInstance() {
-            INSTANCE = null
-        }
-
-        // Obtener repository directamente
         fun getRepository(context: Context): WeightProgressRepository {
             return WeightProgressRepository(getInstance(context).weightProgressDao())
         }
