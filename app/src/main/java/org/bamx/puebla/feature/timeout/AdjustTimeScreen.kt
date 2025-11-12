@@ -30,12 +30,13 @@ import org.bamx.puebla.ui.theme.parents_bg_top
 @Composable
 fun AdjustTimeScreen(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    gameTimeMinutes: Int,
+    breakTimeSeconds: Int,
+    onGameTimeChange: (Int) -> Unit,
+    onBreakTimeChange: (Int) -> Unit,
+    onSaveSettings: () -> Unit
 ) {
-    // Estados para los tiempos
-    var gameTimeMinutes by remember { mutableIntStateOf(15) }
-    var breakTimeSeconds by remember { mutableIntStateOf(30) }
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -51,12 +52,10 @@ fun AdjustTimeScreen(
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // BARRA SUPERIOR
             AdjustTimeTopBar(onBackClick = onBackClick)
 
             Spacer(Modifier.height(24.dp))
 
-            // Tarjeta de tiempo de juego
             TimeCard(
                 title = stringResource(R.string.time_game_title),
                 subtitle = stringResource(R.string.time_game_subtitle),
@@ -65,16 +64,15 @@ fun AdjustTimeScreen(
                 plusCd = stringResource(R.string.cd_increase_minutes),
                 modifier = Modifier.fillMaxWidth(),
                 onMinusClick = {
-                    if (gameTimeMinutes > 5) gameTimeMinutes -= 5
+                    if (gameTimeMinutes > 5) onGameTimeChange(gameTimeMinutes - 5)
                 },
                 onPlusClick = {
-                    if (gameTimeMinutes < 60) gameTimeMinutes += 5
+                    if (gameTimeMinutes < 120) onGameTimeChange(gameTimeMinutes + 5)
                 }
             )
 
             Spacer(Modifier.height(16.dp))
 
-            // Tarjeta de pausa de estiramiento
             TimeCard(
                 title = stringResource(R.string.time_break_title),
                 subtitle = stringResource(R.string.time_break_subtitle),
@@ -83,21 +81,18 @@ fun AdjustTimeScreen(
                 plusCd = stringResource(R.string.cd_increase_seconds),
                 modifier = Modifier.fillMaxWidth(),
                 onMinusClick = {
-                    if (breakTimeSeconds > 10) breakTimeSeconds -= 10
+                    if (breakTimeSeconds > 10) onBreakTimeChange(breakTimeSeconds - 10)
                 },
                 onPlusClick = {
-                    if (breakTimeSeconds < 120) breakTimeSeconds += 10
+                    if (breakTimeSeconds < 600) onBreakTimeChange(breakTimeSeconds + 10)
                 }
             )
 
             Spacer(Modifier.weight(1f))
 
-            // Botón GUARDAR
             Button(
                 onClick = {
-                    // Aquí guardarías las configuraciones
-                    println("Tiempo de juego guardado: $gameTimeMinutes minutos")
-                    println("Tiempo de pausa guardado: $breakTimeSeconds segundos")
+                    onSaveSettings()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -268,7 +263,7 @@ private fun TimeControlButton(
     }
 }
 
-/* ---------- PREVIEWS ---------- */
+/* ---------- PREVIEWS CORREGIDAS ---------- */
 
 @Preview(
     name = "AdjustTime - Light",
@@ -283,8 +278,19 @@ private fun PreviewAdjustTimeLight() {
             modifier = Modifier.fillMaxSize(),
             color = parents_bg_top
         ) {
+            var gameTime by remember { mutableIntStateOf(15) }
+            var breakTime by remember { mutableIntStateOf(30) }
+
             AdjustTimeScreen(
-                onBackClick = {}
+                onBackClick = {},
+                gameTimeMinutes = gameTime,
+                breakTimeSeconds = breakTime,
+                onGameTimeChange = { gameTime = it },
+                onBreakTimeChange = { breakTime = it },
+                onSaveSettings = {
+                    // Simular guardado en preview
+                    println("Guardando: $gameTime min, $breakTime seg")
+                }
             )
         }
     }
@@ -304,9 +310,39 @@ private fun PreviewAdjustTimeDark() {
             modifier = Modifier.fillMaxSize(),
             color = parents_bg_top
         ) {
+            var gameTime by remember { mutableIntStateOf(20) }
+            var breakTime by remember { mutableIntStateOf(45) }
+
             AdjustTimeScreen(
-                onBackClick = {}
+                onBackClick = {},
+                gameTimeMinutes = gameTime,
+                breakTimeSeconds = breakTime,
+                onGameTimeChange = { gameTime = it },
+                onBreakTimeChange = { breakTime = it },
+                onSaveSettings = {
+                    // Simular guardado en preview
+                    println("Guardando: $gameTime min, $breakTime seg")
+                }
             )
         }
+    }
+}
+
+// Preview simplificada para testing rápido
+@Preview(
+    name = "AdjustTime - Simple",
+    showBackground = true
+)
+@Composable
+private fun PreviewAdjustTimeSimple() {
+    AppTheme {
+        AdjustTimeScreen(
+            onBackClick = {},
+            gameTimeMinutes = 15,
+            breakTimeSeconds = 30,
+            onGameTimeChange = { },
+            onBreakTimeChange = { },
+            onSaveSettings = { }
+        )
     }
 }

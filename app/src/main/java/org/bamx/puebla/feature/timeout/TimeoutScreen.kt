@@ -29,7 +29,14 @@ import org.bamx.puebla.ui.theme.Dimens.timeoutPanelCorner
 import org.bamx.puebla.ui.theme.Dimens.timeoutScreenPadding
 
 @Composable
-fun TimeoutScreen() {
+fun TimeoutScreen(
+    onBreakCompleted: () -> Unit = {},
+    remainingTime: Long
+) {
+    val minutes = remainingTime / 60
+    val seconds = remainingTime % 60
+    val timeText = String.format("%02d:%02d", minutes, seconds)
+
     val screenW = LocalConfiguration.current.screenWidthDp
     val isSmall = screenW <= 360
 
@@ -38,7 +45,6 @@ fun TimeoutScreen() {
 
     val timerSize = if (isSmall) 96.dp else 108.dp
     val timerBottomPadding = 20.dp
-    // Clearance para que la mascota NO invada el timer (y no “flote”):
     val bottomClearance = timerSize + timerBottomPadding + 6.dp
 
     AppScaffold(
@@ -63,30 +69,27 @@ fun TimeoutScreen() {
                     widthFraction = signWidthFraction
                 )
 
-                // Área central: usamos un Box con weight(1f) y ANCLAMOS la mascota al fondo
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.nutri_timeout ),
+                        painter = painterResource(id = R.drawable.nutri_timeout),
                         contentDescription = stringResource(id = R.string.cd_timeout_mascot),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)         // << clave: anclada al fondo
-                            .padding(bottom = bottomClearance)      // deja sitio para el timer
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = bottomClearance)
                             .fillMaxWidth(mascotWidthFraction * 3)
                     )
                 }
 
-                // Relleno para respetar gestos (no hay botones)
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             }
 
-            // Temporizador abajo-izquierda
             TimeoutTimer(
-                timeText = "29:58",
+                timeText = timeText,
                 size = timerSize,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -124,7 +127,7 @@ private fun TimeoutHeaderAndBody(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 26.sp,         // ↑ más grande
+                    fontSize = 26.sp,
                     lineHeight = 28.sp
                 )
             )
@@ -175,7 +178,7 @@ private fun TimeoutTimer(
     }
 }
 
-/* ---------- PREVIEWS ---------- */
+/* ---------- PREVIEWS CORREGIDAS ---------- */
 
 @Preview(
     name = "Timeout - 411x891 Light",
@@ -184,7 +187,12 @@ private fun TimeoutTimer(
 )
 @Composable
 private fun PreviewTimeoutLight() {
-    AppTheme(darkTheme = false) { TimeoutScreen() }
+    AppTheme(darkTheme = false) {
+        TimeoutScreen(
+            onBreakCompleted = { },
+            remainingTime = 120 // 2 minutos para el preview
+        )
+    }
 }
 
 @Preview(
@@ -195,5 +203,53 @@ private fun PreviewTimeoutLight() {
 )
 @Composable
 private fun PreviewTimeoutDark() {
-    AppTheme(darkTheme = true) { TimeoutScreen() }
+    AppTheme(darkTheme = true) {
+        TimeoutScreen(
+            onBreakCompleted = { },
+            remainingTime = 45 // 45 segundos para el preview
+        )
+    }
+}
+
+// Preview con diferentes tiempos para testing
+@Preview(
+    name = "Timeout - 5 Minutos",
+    showBackground = true
+)
+@Composable
+private fun PreviewTimeout5Minutes() {
+    AppTheme {
+        TimeoutScreen(
+            onBreakCompleted = { },
+            remainingTime = 300 // 5 minutos
+        )
+    }
+}
+
+@Preview(
+    name = "Timeout - 30 Segundos",
+    showBackground = true
+)
+@Composable
+private fun PreviewTimeout30Seconds() {
+    AppTheme {
+        TimeoutScreen(
+            onBreakCompleted = { },
+            remainingTime = 30 // 30 segundos
+        )
+    }
+}
+
+@Preview(
+    name = "Timeout - Tiempo Casi Terminado",
+    showBackground = true
+)
+@Composable
+private fun PreviewTimeoutAlmostDone() {
+    AppTheme {
+        TimeoutScreen(
+            onBreakCompleted = { },
+            remainingTime = 5 // 5 segundos restantes
+        )
+    }
 }

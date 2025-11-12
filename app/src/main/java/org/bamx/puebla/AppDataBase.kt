@@ -1,16 +1,17 @@
 package org.bamx.puebla
 
 import android.content.Context
+import android.util.Log
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.flow.Flow
-import java.util.*
-import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.util.*
 
-// 1. Entity (Tabla de la base de datos)
+// 1. Entity para progreso de peso
 @Entity(tableName = "weight_progress")
 data class WeightProgress(
     @PrimaryKey(autoGenerate = true)
@@ -18,11 +19,19 @@ data class WeightProgress(
     val weight: Double,
     val date: Date,
     val notes: String = ""
-) {
-    constructor(weight: Double, date: Date, notes: String = "") : this(0, weight, date, notes)
-}
+)
 
-// 2. Converters para las fechas
+// 2. Entity para configuraciones de tiempo
+@Entity(tableName = "time_settings")
+data class TimeSettings(
+    @PrimaryKey
+    val id: Int = 1, // Siempre será 1 para la configuración actual
+    val gameTimeMinutes: Int,
+    val breakTimeSeconds: Int,
+    val lastGameStartTime: Date? = null
+)
+
+// 3. Converters para las fechas
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
@@ -35,128 +44,242 @@ class Converters {
     }
 }
 
-// 3. DAO (Data Access Object)
+// 4. DAO para WeightProgress
 @Dao
 interface WeightProgressDao {
-
     @Query("SELECT * FROM weight_progress ORDER BY date DESC")
     fun getAllWeightProgress(): Flow<List<WeightProgress>>
 
-    @Query("SELECT * FROM weight_progress WHERE date = :date")
-    suspend fun getWeightProgressByDate(date: Date): WeightProgress?
-
     @Insert
-    suspend fun insertWeightProgress(weightProgress: WeightProgress)
+    suspend fun insertWeightProgress(weightProgress: WeightProgress): Long
 
     @Update
     suspend fun updateWeightProgress(weightProgress: WeightProgress)
 
     @Delete
     suspend fun deleteWeightProgress(weightProgress: WeightProgress)
-
-    @Query("DELETE FROM weight_progress WHERE id = :id")
-    suspend fun deleteWeightProgressById(id: Long)
-
-    @Query("SELECT * FROM weight_progress WHERE id = :id")
-    suspend fun getWeightProgressById(id: Long): WeightProgress?
 }
 
-// 4. Repository
-class WeightProgressRepository(private val dao: WeightProgressDao) {
+// 5. DAO para TimeSettings
+@Dao
+interface TimeSettingsDao {
+    @Query("SELECT * FROM time_settings WHERE id = 1")
+    fun getTimeSettings(): Flow<TimeSettings?>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTimeSettings(timeSettings: TimeSettings)
+
+    @Update
+    suspend fun updateTimeSettings(timeSettings: TimeSettings)
+
+    @Query("UPDATE time_settings SET lastGameStartTime = :startTime WHERE id = 1")
+    suspend fun updateLastGameStartTime(startTime: Date)
+}
+
+// 6. Repository para WeightProgress
+class WeightProgressRepository(private val dao: WeightProgressDao) {
     fun getAllWeightProgress(): Flow<List<WeightProgress>> {
         return dao.getAllWeightProgress()
     }
 
-    suspend fun addWeightProgress(name: String, weight: Double, date: Date = Date()) {
-        val weightProgress = WeightProgress(
-            weight = weight,
-            date = date,
-            notes = name // Usamos el campo notes para almacenar el nombre
-        )
-        dao.insertWeightProgress(weightProgress)
+    suspend fun addWeightProgress(name: String, weight: Double, date: Date = Date()): Boolean {
+        return try {
+            val weightProgress = WeightProgress(
+                weight = weight,
+                date = date,
+                notes = name
+            )
+            dao.insertWeightProgress(weightProgress)
+            true
+        } catch (e: Exception) {
+            Log.e("WeightProgressRepository", "Error al agregar progreso: ${e.message}")
+            false
+        }
     }
 
-    suspend fun updateWeightProgress(weightProgress: WeightProgress) {
-        dao.updateWeightProgress(weightProgress)
+    suspend fun updateWeightProgress(weightProgress: WeightProgress): Boolean {
+        return try {
+            dao.updateWeightProgress(weightProgress)
+            true
+        } catch (e: Exception) {
+            Log.e("WeightProgressRepository", "Error al actualizar progreso: ${e.message}")
+            false
+        }
     }
 
-    suspend fun deleteWeightProgress(weightProgress: WeightProgress) {
-        dao.deleteWeightProgress(weightProgress)
-    }
-
-    suspend fun getWeightProgressById(id: Long): WeightProgress? {
-        return dao.getWeightProgressById(id)
+    suspend fun deleteWeightProgress(weightProgress: WeightProgress): Boolean {
+        return try {
+            dao.deleteWeightProgress(weightProgress)
+            true
+        } catch (e: Exception) {
+            Log.e("WeightProgressRepository", "Error al eliminar progreso: ${e.message}")
+            false
+        }
     }
 }
 
-// 5. Database
-// En AppDatabase.kt - Versión simplificada y segura
+// 7. Repository para TimeSettings
+class TimeSettingsRepository(private val dao: TimeSettingsDao) {
+    fun getTimeSettings(): Flow<TimeSettings?> {
+        return dao.getTimeSettings()
+    }
+
+    suspend fun saveTimeSettings(gameTimeMinutes: Int, breakTimeSeconds: Int): Boolean {
+        return try {
+            val timeSettings = TimeSettings(
+                id = 1,
+                gameTimeMinutes = gameTimeMinutes,
+                breakTimeSeconds = breakTimeSeconds
+            )
+            dao.insertTimeSettings(timeSettings)
+            true
+        } catch (e: Exception) {
+            Log.e("TimeSettingsRepository", "Error guardando configuraciones: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun updateLastGameStartTime(startTime: Date): Boolean {
+        return try {
+            dao.updateLastGameStartTime(startTime)
+            true
+        } catch (e: Exception) {
+            Log.e("TimeSettingsRepository", "Error actualizando tiempo de inicio: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun getCurrentTimeSettings(): TimeSettings? {
+        return try {
+            dao.getTimeSettings().firstOrNull()
+        } catch (e: Exception) {
+            Log.e("TimeSettingsRepository", "Error obteniendo configuraciones: ${e.message}")
+            null
+        }
+    }
+}
+
+// 8. Database principal
 @Database(
-    entities = [WeightProgress::class],
-    version = 1,
+    entities = [WeightProgress::class, TimeSettings::class],
+    version = 2, // ← Versión incrementada
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun weightProgressDao(): WeightProgressDao
+    abstract fun timeSettingsDao(): TimeSettingsDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "app_database"
-                ).build()
-                INSTANCE = instance
-                instance
+        fun getInstance(context: Context): AppDatabase? {
+            return try {
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
+                }
+            } catch (e: Exception) {
+                Log.e("AppDatabase", "Error al crear la base de datos: ${e.message}")
+                null
             }
         }
 
-        fun getRepository(context: Context): WeightProgressRepository {
-            return WeightProgressRepository(getInstance(context).weightProgressDao())
+        private fun buildDatabase(context: Context): AppDatabase {
+            return Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                "app_database.db"
+            )
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        // Insertar configuraciones por defecto en un hilo background
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                getInstance(context)?.timeSettingsDao()?.insertTimeSettings(
+                                    TimeSettings(
+                                        id = 1,
+                                        gameTimeMinutes = 15,
+                                        breakTimeSeconds = 30
+                                    )
+                                )
+                                Log.d("AppDatabase", "Configuraciones por defecto insertadas")
+                            } catch (e: Exception) {
+                                Log.e("AppDatabase", "Error insertando configuraciones por defecto: ${e.message}")
+                            }
+                        }
+                    }
+                })
+                .build()
+        }
+
+        fun getRepository(context: Context): WeightProgressRepository? {
+            return try {
+                val database = getInstance(context)
+                if (database != null) {
+                    WeightProgressRepository(database.weightProgressDao())
+                } else {
+                    Log.e("AppDatabase", "No se pudo obtener la instancia de la base de datos")
+                    null
+                }
+            } catch (e: Exception) {
+                Log.e("AppDatabase", "Error obteniendo repository: ${e.message}")
+                null
+            }
+        }
+
+        fun getTimeSettingsRepository(context: Context): TimeSettingsRepository? {
+            return try {
+                val database = getInstance(context)
+                if (database != null) {
+                    TimeSettingsRepository(database.timeSettingsDao())
+                } else {
+                    Log.e("AppDatabase", "No se pudo obtener la instancia de la base de datos")
+                    null
+                }
+            } catch (e: Exception) {
+                Log.e("AppDatabase", "Error obteniendo time settings repository: ${e.message}")
+                null
+            }
         }
     }
 }
 
-// 7. Helper functions para usar en tu ProgressScreen
+// 9. Helper functions
 object DatabaseHelper {
-
-    // Función para determinar el color de fondo basado en la tendencia del peso
     fun getBackgroundColorForWeight(
         currentWeight: WeightProgress,
         allWeights: List<WeightProgress>
     ): Int {
+        if (allWeights.size < 2) return 0xFFE8F7EA.toInt()
+
         val sortedWeights = allWeights.sortedBy { it.date }
         val currentIndex = sortedWeights.indexOfFirst { it.id == currentWeight.id }
 
         if (currentIndex > 0) {
             val previousWeight = sortedWeights[currentIndex - 1]
             return if (currentWeight.weight <= previousWeight.weight) {
-                0xFFE8F7EA.toInt() // Verde - peso igual o menor (bueno)
+                0xFFE8F7EA.toInt() // Verde
             } else {
-                0xFFFFEDED.toInt() // Rojo - peso mayor (alerta)
+                0xFFFFEDED.toInt() // Rojo
             }
         }
-
-        return 0xFFE8F7EA.toInt() // Primer registro
+        return 0xFFE8F7EA.toInt()
     }
 
-    // Formatear fecha para mostrar
     fun formatDate(date: Date): String {
-        return java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+        return try {
+            java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+        } catch (e: Exception) {
+            "Fecha inválida"
+        }
     }
 
-    // Formatear peso para mostrar
     fun formatWeight(weight: Double): String {
         return String.format("%.1f", weight)
     }
 
-    // Validar peso
     fun isValidWeight(weight: String): Boolean {
         return weight.toDoubleOrNull() != null && weight.toDouble() > 0
     }
