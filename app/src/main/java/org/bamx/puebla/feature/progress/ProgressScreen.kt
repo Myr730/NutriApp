@@ -364,17 +364,7 @@ fun ProgressScreenContent(
             Spacer(Modifier.height(110.dp))
         }
 
-        // Botón de regresar - simplificado
-        Image(
-            painter = painterResource(id = R.drawable.ic_back2),
-            contentDescription = stringResource(id = R.string.cd_back),
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 12.dp, top = 12.dp)
-                .size(52.dp)
-                .clickable { onBackClick() },
-            contentScale = ContentScale.Fit
-        )
+       
 
         // FAB para agregar registro
         FloatingActionButton(

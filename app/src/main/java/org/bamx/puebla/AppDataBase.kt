@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.*
 
+
 // 1. Entity para progreso de peso
 @Entity(tableName = "weight_progress")
 data class WeightProgress(
@@ -24,10 +25,10 @@ data class WeightProgress(
 // 2. Entity para configuraciones de tiempo
 @Entity(tableName = "time_settings")
 data class TimeSettings(
-    @PrimaryKey
-    val id: Int = 1, // Siempre será 1 para la configuración actual
-    val gameTimeMinutes: Int,
-    val breakTimeSeconds: Int,
+    @PrimaryKey // CORRECCIÓN: Agregar PrimaryKey
+    val id: Int = 1, // CORRECCIÓN: Agregar campo id
+    val gameTimeMinutes: Int = 0,
+    val breakTimeSeconds: Int = 0,
     val lastGameStartTime: Date? = null
 )
 
@@ -60,7 +61,7 @@ interface WeightProgressDao {
     suspend fun deleteWeightProgress(weightProgress: WeightProgress)
 }
 
-// 5. DAO para TimeSettings
+// 5. DAO para TimeSettings - CORREGIDO
 @Dao
 interface TimeSettingsDao {
     @Query("SELECT * FROM time_settings WHERE id = 1")
@@ -72,8 +73,9 @@ interface TimeSettingsDao {
     @Update
     suspend fun updateTimeSettings(timeSettings: TimeSettings)
 
+    // CORRECCIÓN: Cambiar el parámetro a nullable
     @Query("UPDATE time_settings SET lastGameStartTime = :startTime WHERE id = 1")
-    suspend fun updateLastGameStartTime(startTime: Date)
+    suspend fun updateLastGameStartTime(startTime: Date?) // ✅ Cambiado a Date?
 }
 
 // 6. Repository para WeightProgress
@@ -118,7 +120,7 @@ class WeightProgressRepository(private val dao: WeightProgressDao) {
     }
 }
 
-// 7. Repository para TimeSettings
+// 7. Repository para TimeSettings - CORREGIDO
 class TimeSettingsRepository(private val dao: TimeSettingsDao) {
     fun getTimeSettings(): Flow<TimeSettings?> {
         return dao.getTimeSettings()
@@ -139,7 +141,8 @@ class TimeSettingsRepository(private val dao: TimeSettingsDao) {
         }
     }
 
-    suspend fun updateLastGameStartTime(startTime: Date): Boolean {
+    // CORRECCIÓN: Cambiar el parámetro a nullable
+    suspend fun updateLastGameStartTime(startTime: Date?): Boolean { // ✅ Cambiado a Date?
         return try {
             dao.updateLastGameStartTime(startTime)
             true
@@ -159,10 +162,10 @@ class TimeSettingsRepository(private val dao: TimeSettingsDao) {
     }
 }
 
-// 8. Database principal
+// 8. Database principal - VERSIÓN CORREGIDA
 @Database(
     entities = [WeightProgress::class, TimeSettings::class],
-    version = 2, // ← Versión incrementada
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -194,19 +197,20 @@ abstract class AppDatabase : RoomDatabase() {
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-                        // Insertar configuraciones por defecto en un hilo background
+                        // Insertar configuraciones por defecto usando SQL directo
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                getInstance(context)?.timeSettingsDao()?.insertTimeSettings(
+                                // Usar la instancia recién creada, no getInstance()
+                                INSTANCE?.timeSettingsDao()?.insertTimeSettings(
                                     TimeSettings(
                                         id = 1,
                                         gameTimeMinutes = 15,
                                         breakTimeSeconds = 30
                                     )
                                 )
-                                Log.d("AppDatabase", "Configuraciones por defecto insertadas")
+                                Log.d("AppDatabase", "✅ Configuraciones por defecto insertadas")
                             } catch (e: Exception) {
-                                Log.e("AppDatabase", "Error insertando configuraciones por defecto: ${e.message}")
+                                Log.e("AppDatabase", "❌ Error insertando configuraciones: ${e.message}")
                             }
                         }
                     }
@@ -214,6 +218,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .build()
         }
 
+        // Los demás métodos permanecen igual...
         fun getRepository(context: Context): WeightProgressRepository? {
             return try {
                 val database = getInstance(context)

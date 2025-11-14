@@ -23,6 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import org.bamx.puebla.ui.theme.AppTheme
 import org.bamx.puebla.ui.theme.parents_bg_bottom
 import org.bamx.puebla.ui.theme.parents_bg_top

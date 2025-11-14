@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.bamx.puebla.feature.ConsejosScreen
 import kotlinx.coroutines.flow.asStateFlow
 import org.bamx.puebla.feature.armatuplato.ArmaTuPlatoScreen
 import org.bamx.puebla.feature.game.ClassifyGameScreen
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
     // Estados para controlar el timeout
     private val _shouldShowTimeout = MutableStateFlow(false)
     private val _remainingBreakTime = MutableStateFlow(0L)
+    private val _isGameSessionActive = MutableStateFlow(false)
 
     // Coroutine scope para operaciones en background
     private val appScope = CoroutineScope(Dispatchers.IO)
@@ -48,7 +50,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                // Pasar los estados a la navegación
                 AppNavGraph(
                     shouldShowTimeout = _shouldShowTimeout.asStateFlow(),
                     remainingBreakTime = _remainingBreakTime.asStateFlow(),
@@ -74,7 +75,14 @@ class MainActivity : ComponentActivity() {
             val repository = AppDatabase.getTimeSettingsRepository(this@MainActivity)
             val settings = repository?.getCurrentTimeSettings()
 
-            if (settings?.lastGameStartTime != null) {
+            val isValidSession = settings?.let {
+                it.gameTimeMinutes > 0 &&
+                    it.breakTimeSeconds > 0 &&
+                    it.lastGameStartTime != null &&
+                    _isGameSessionActive.value
+            } ?: false
+
+            if (isValidSession && settings != null && settings.lastGameStartTime != null) {
                 val currentTime = Date().time
                 val gameStartTime = settings.lastGameStartTime.time
                 val gameDuration = settings.gameTimeMinutes * 60 * 1000L
@@ -83,7 +91,6 @@ class MainActivity : ComponentActivity() {
                 _shouldShowTimeout.value = shouldShow
 
                 if (shouldShow) {
-                    // Calcular tiempo restante del break
                     val breakStartTime = gameStartTime + gameDuration
                     val breakDuration = settings.breakTimeSeconds * 1000L
                     val elapsedBreakTime = currentTime - breakStartTime
@@ -91,9 +98,11 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 _shouldShowTimeout.value = false
+                _remainingBreakTime.value = 0L
             }
         } catch (e: Exception) {
             Log.e("MainActivity", "Error monitoreando tiempo: ${e.message}")
+            _shouldShowTimeout.value = false
         }
     }
 
@@ -101,11 +110,21 @@ class MainActivity : ComponentActivity() {
         appScope.launch {
             try {
                 val repository = AppDatabase.getTimeSettingsRepository(this@MainActivity)
-                repository?.updateLastGameStartTime(Date())
-                _shouldShowTimeout.value = false
-                Log.d("MainActivity", "Sesión de juego iniciada")
+                val settings = repository?.getCurrentTimeSettings()
+
+                // SOLUCIÓN: Solo iniciar sesión si hay configuración válida
+                if (settings?.gameTimeMinutes ?: 0 > 0 && settings?.breakTimeSeconds ?: 0 > 0) {
+                    repository?.updateLastGameStartTime(Date())
+                    _isGameSessionActive.value = true
+                    _shouldShowTimeout.value = false
+                    Log.d("MainActivity", "Sesión de juego iniciada con configuración válida")
+                } else {
+                    Log.d("MainActivity", "No hay configuración de tiempo, timeout desactivado")
+                    _isGameSessionActive.value = false
+                }
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error iniciando sesión: ${e.message}")
+                _isGameSessionActive.value = false
             }
         }
     }
@@ -114,7 +133,8 @@ class MainActivity : ComponentActivity() {
         appScope.launch {
             try {
                 val repository = AppDatabase.getTimeSettingsRepository(this@MainActivity)
-                repository?.updateLastGameStartTime(Date(0))
+                repository?.updateLastGameStartTime(null)
+                _isGameSessionActive.value = false
                 _shouldShowTimeout.value = false
                 Log.d("MainActivity", "Sesión de juego reiniciada")
             } catch (e: Exception) {
@@ -128,7 +148,9 @@ class MainActivity : ComponentActivity() {
             try {
                 val repository = AppDatabase.getTimeSettingsRepository(this@MainActivity)
                 repository?.saveTimeSettings(gameTimeMinutes, breakTimeSeconds)
-                Log.d("MainActivity", "Tiempos guardados: $gameTimeMinutes min, $breakTimeSeconds seg")
+                _isGameSessionActive.value = false
+                _shouldShowTimeout.value = false
+                Log.d("MainActivity", "Tiempos guardados: $gameTimeMinutes min, $breakTimeSeconds seg - Sesión resetada")
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error guardando tiempos: ${e.message}")
             }
@@ -184,7 +206,6 @@ fun AppNavGraph(
     // Navegar automáticamente al timeout cuando sea necesario
     LaunchedEffect(showTimeout) {
         if (showTimeout) {
-            // Solo navegar si no estamos ya en la pantalla de timeout
             if (navController.currentDestination?.route != Screen.Timeout.route) {
                 println("NAVIGATION: Mostrando TimeoutScreen automáticamente")
                 navController.navigate(Screen.Timeout.route)
@@ -200,8 +221,6 @@ fun AppNavGraph(
             HomeScreen(
                 onPlayClick = {
                     println("NAVIGATION: Navegando a LevelSelection")
-                    // Iniciar sesión de juego cuando el usuario empieza a jugar
-                    onStartGame()
                     navController.navigate(Screen.LevelSelection.route)
                 },
                 onParentsClick = {
@@ -219,7 +238,9 @@ fun AppNavGraph(
                 },
                 onLevelSelected = { levelId ->
                     println("NAVIGATION: Nivel $levelId seleccionado")
-                    // Iniciar sesión de juego cuando selecciona un nivel
+
+                    // SOLUCIÓN: Permitir jugar siempre, sin verificación de configuración
+                    // Solo iniciar sesión si el usuario configuró tiempos
                     onStartGame()
 
                     when (levelId) {
@@ -274,13 +295,11 @@ fun AppNavGraph(
             )
         }
 
-        // NUEVA PANTALLA TIMEOUT
         composable(Screen.Timeout.route) {
             TimeoutScreenWrapper(
                 onBreakCompleted = {
                     println("NAVIGATION: Break completado, regresando a Home")
                     onResetGame()
-                    // Navegar a Home y limpiar el back stack
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
@@ -320,7 +339,16 @@ fun AppNavGraph(
         composable(Screen.ClassifyGame.route) {
             ClassifyGameScreen(
                 onBackClick = {
-                    println("NAVIGATION: Regresando a LevelSelection desde ClassifyMock")
+                    println("NAVIGATION: Regresando a LevelSelection desde ClassifyGame")
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Consejos.route) {
+            ConsejosScreen(
+                onBackClick = {
+                    println("NAVIGATION: Regresando a Parents desde Consejos")
                     navController.popBackStack()
                 }
             )
