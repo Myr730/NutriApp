@@ -700,7 +700,7 @@ private fun PlayingStateUI(
                 contentDescription = "Licuadora",
                 modifier = Modifier
                     .size(160.dp)
-                    .offset(x = (7).dp, y = 30.dp)
+                    .offset(x = (5).dp, y = 30.dp) // <- Agregar offset vertical aquí
                     .clickable(enabled = blenderEnabled) { onBlenderClick() },
                 contentScale = ContentScale.Fit,
                 alpha = if (blenderEnabled) 1f else 0.3f
@@ -742,8 +742,9 @@ private fun PlayingStateUI(
                 contentDescription = "Leche",
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp, bottom = 160.dp)
-                    .size(140.dp)
+                    .offset(x = (40).dp, y = -60.dp)
+                    .padding(end = 50.dp, bottom = 100.dp)
+                    .size(120.dp)
                     .clickable { onMilkClick() },
                 contentScale = ContentScale.Fit
             )
@@ -781,8 +782,8 @@ private fun PlayingStateUI(
             contentDescription = "Botón licuadora",
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 140.dp, bottom = 150.dp)
-                .size(100.dp, 25.dp)
+                .padding(start = 150.dp, bottom = 150.dp)
+                .size(120.dp, 35.dp)
                 .clickable(enabled = blenderEnabled) { onBlenderClick() },
             contentScale = ContentScale.FillBounds,
             alpha = if (blenderEnabled) 1f else 0.5f

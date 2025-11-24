@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.bamx.puebla.feature.ConsejosScreen
 import kotlinx.coroutines.flow.asStateFlow
-import org.bamx.puebla.feature.armatuplato.ArmaTuPlatoScreen
+import org.bamx.puebla.feature.armatuplato.PlatoScreen
 import org.bamx.puebla.feature.game.ClassifyGameScreen
 import org.bamx.puebla.feature.guess.GuessTheVegetableScreen
 import org.bamx.puebla.feature.home.HomeScreen
@@ -355,7 +355,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.ArmaTuPlato.route) {
-            ArmaTuPlatoScreen(
+            PlatoScreen(
                 onBackClick = {
                     println("NAVIGATION: Regresando a LevelSelection desde ArmaTuPlato")
                     navController.popBackStack()
