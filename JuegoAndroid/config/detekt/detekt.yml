@@ -1,0 +1,42 @@
+# Detekt 1.23.x — Config mínima y suave
+
+config:
+    validation: true
+
+build:
+    maxIssues: 0
+
+processors:
+    active: true
+
+# --- Reglas (colocadas directamente en la raíz, sin 'rules:' ni 'detekt:') ---
+
+comments:
+    UndocumentedPublicClass:
+        active: false
+    UndocumentedPublicFunction:
+        active: false
+
+style:
+    MagicNumber:
+        active: false
+    WildcardImport:
+        active: true
+    MaxLineLength:
+        active: true
+        maxLineLength: 140
+    ReturnCount:
+        active: false
+
+complexity:
+    LongMethod:
+        active: false
+    TooManyFunctions:
+        active: false
+
+# Reglas de "detekt-formatting" (usa ktlint debajo)
+formatting:
+    active: true
+    android: true
+    MaximumLineLength:
+        active: false   # dejamos que 'style.MaxLineLength' controle el límite

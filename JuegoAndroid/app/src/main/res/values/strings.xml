@@ -1,0 +1,213 @@
+<!-- BAMXPuebla/app/src/main/res/values/strings.xml -->
+<resources>
+    <string name="app_name">BAMX Puebla</string>
+    <string name="hello_preview">¡Hola, Compose!</string>
+
+    <!-- Pantallas -->
+    <string name="home_title">Pantalla inicial</string>
+    <string name="parents_title">Pantalla de padres</string>
+
+    <string name="btn_primary">Continuar</string>
+    <string name="btn_secondary">Más info</string>
+    <string name="sample_title">Título de sección</string>
+    <string name="sample_body">Este es un texto de ejemplo para previsualizar el contenido dentro de una tarjeta reutilizable.</string>
+
+    <!-- Home -->
+    <string name="home_header_title">BAMX Puebla</string>
+    <string name="home_subtitle">Aprende y juega con Nutri</string>
+    <string name="home_btn_start">Comenzar</string>
+
+    <!-- A11y -->
+    <string name="cd_home_illustration">Ilustración temática de alimentación saludable</string>
+    <string name="home_btn_play">JUGAR</string>
+    <string name="home_btn_parents">PADRES</string>
+    <string name="home_btn_settings">AJUSTES</string>
+
+    <!-- A11y -->
+    <string name="cd_logo_bamx">Logo de BAMX Puebla</string>
+    <string name="cd_title_aventuras">Título Aventuras con Nutri</string>
+    <string name="cd_mascot_nutri">Nutri saludando</string>
+    <string name="brand_bamx">BAMX</string>
+    <string name="brand_puebla">Puebla</string>
+    <string name="parents_header">Padres</string>
+
+    <!-- Secciones -->
+    <string name="parents_section_info">Información</string>
+    <string name="parents_section_settings">Ajustes</string>
+    <string name="parents_section_help">Ayuda</string>
+
+    <!-- Info -->
+    <string name="parents_info_app">App: Aventuras con Nutri</string>
+    <string name="parents_info_version">Versión 1.0 (UI demo)</string>
+    <string name="parents_info_desc">Recursos y actividades para alimentación saludable.</string>
+
+    <!-- Ajustes (solo visual) -->
+    <string name="parents_opt_notifications">Notificaciones</string>
+    <string name="parents_opt_language">Idioma</string>
+    <string name="parents_opt_language_value">Español (MX)</string>
+    <string name="parents_opt_sound">Sonido</string>
+
+    <!-- Ayuda -->
+    <string name="parents_help_guide">Guía para padres</string>
+    <string name="parents_help_faq">Preguntas frecuentes</string>
+    <string name="parents_help_contact">Contacto</string>
+    <string name="parents_help_email">soporte@bamx.org.mx</string>
+
+    <!-- A11y -->
+    <string name="cd_parents_icon_info">Icono de información</string>
+    <string name="cd_parents_icon_settings">Icono de ajustes</string>
+    <string name="cd_parents_icon_help">Icono de ayuda</string>
+    <!-- PADRES (mockup nuevo) -->
+    <string name="parents_title_big">PADRES</string>
+    <string name="parents_card_progress">PROGRESO(peso/talla)</string>
+    <string name="parents_card_weight">PESO/TALLA</string>
+    <string name="parents_card_tips">CONSEJOS Y RECETAS</string>
+    <string name="parents_card_time">TIEMPO DE JUEGO</string>
+    <string name="parents_card_info">ACERCA DE LA APP</string>
+
+    <!-- AdjustTimeScreen strings -->
+    <string name="time_screen_title">AJUSTAR TIEMPO</string>
+    <string name="time_game_title">Tiempo de juego</string>
+    <string name="time_game_subtitle">¿Cuánto quieres jugar antes del descanso?</string>
+    <string name="time_break_title">Pausa de estiramiento</string>
+    <string name="time_break_subtitle">Duración de la pausa para moverse</string>
+    <string name="time_save_button">GUARDAR</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_decrease_minutes">Disminuir minutos</string>
+    <string name="cd_increase_minutes">Aumentar minutos</string>
+    <string name="cd_decrease_seconds">Disminuir segundos</string>
+    <string name="cd_increase_seconds">Aumentar segundos</string>
+
+
+
+
+    <!-- A11y -->
+    <string name="cd_back">Atrás (sin funcionalidad)</string>
+    <string name="cd_icon_progress">Icono de progreso</string>
+    <string name="cd_icon_weight">Icono de peso/talla</string>
+    <string name="cd_icon_tips">Icono de consejos y recetas</string>
+    <string name="cd_icon_time">Icono de tiempo de juego</string>
+    <!-- Juego -->
+    <string name="game_title">Juego</string>
+    <string name="game_instructions_title">Instrucciones</string>
+    <string name="game_instructions_body">Arrastra los alimentos a su categoría correcta. Completa el tablero antes de que el tiempo termine.</string>
+    <string name="game_score">Puntos</string>
+    <string name="game_lives">Vidas</string>
+    <string name="game_time">Tiempo</string>
+    <string name="game_btn_start">Iniciar</string>
+    <string name="game_btn_reset">Reiniciar</string>
+
+    <!-- A11y -->
+    <string name="cd_game_board">Área del juego</string>
+
+    <!-- Clasifica el alimento (mock) -->
+    <string name="classify_title">CLASIFICA EL ALIMENTO</string>
+    <string name="classify_daily">DIARIO</string>
+    <string name="classify_sometimes">A VECES</string>
+    <string name="classify_rare">OCASIONAL</string>
+    <string name="classify_feedback_title">¡MUY BIEN!</string>
+    <string name="classify_feedback_desc">La fruta es diaria</string>
+
+    <!-- A11y -->
+    <string name="cd_pause">Pausar (sin funcionalidad)</string>
+    <string name="cd_sign">Cartel del título</string>
+    <string name="cd_food">Alimento a clasificar</string>
+    <string name="cd_basket_daily">Canasta Diario</string>
+    <string name="cd_basket_sometimes">Canasta A veces</string>
+    <string name="cd_basket_rare">Canasta Occasional</string>
+    <!-- Título en dos líneas para el juego -->
+    <string name="classify_title_multiline">CLASIFICA\nEL ALIMENTO</string>
+    <!-- Juego: panel de feedback -->
+    <string name="classify_feedback_title_text">¡MUY BIEN!</string>
+    <string name="classify_feedback_desc_text">La fruta es diaria</string>
+
+    <string name="btn_play">JUGAR</string>
+    <string name="btn_parents">PADRES</string>
+    <string name="btn_settings">AJUSTES</string>
+
+
+
+    <!-- Padres -->
+    <string name="parents_progress">PROGRESO</string>
+    <string name="parents_weight_height">PESO/TALLA</string>
+    <string name="parents_tips_recipes">CONSEJOS Y RECETAS</string>
+    <string name="parents_playtime">TIEMPO DE JUEGO</string>
+    <string name="timeout_title">¡HORA DE MOVERSE!</string>
+    <string name="timeout_body">Llevas 15 min jugando, hagamos 5 minutos de estiramiento.</string>
+    <string name="cd_timeout_bg">Fondo de una sala con muebles</string>
+    <string name="cd_timeout_mascot">Nutri estirándose</string>
+    <string name="cd_timeout_timer">Temporizador circular</string>
+    <string name="memorama_title">¡Encuentra las parejas iguales!</string>
+    <string name="memorama_back">Regresar</string>
+    <string name="cd_memorama_bg">Fondo de picnic con mantel</string>
+    <string name="cd_card_back">Reverso de carta</string>
+    <string name="cd_card_placeholder">Ícono de carta (placeholder)</string>
+    <string name="level_select_title">¡ELIGE TU NIVEL!</string>
+    <string name="level_tip_swipe">DESLIZA PARA VER MÁS NIVELES</string>
+    <string name="cd_level_icon">Ícono del nivel</string>
+    <string name="cd_arrow_left">Nivel anterior</string>
+    <string name="cd_arrow_right">Siguiente nivel</string>
+    <string name="cd_mascot">Nutri señalando</string>
+    <!-- Smoothie / Arma tu licuado -->
+    <string name="smoothie_title">¡PREPARA EL LICUADO!</string>
+    <string name="cd_bg_smoothie">Fondo de la cocina con Nutri</string>
+
+    <!-- Accesibilidad de ingredientes -->
+    <string name="cd_required_ingredient">Ingrediente requerido</string>
+    <string name="cd_fruit_option">Opción de fruta</string>
+
+    <!-- Frutas (para contentDescription específicos) -->
+
+    <string name="cd_food_banana">Plátano</string>
+    <string name="cd_food_strawberry">Fresa</string>
+    <string name="cd_food_grape">Uva</string>
+    <string name="cd_food_orange">Naranja</string>
+
+    <string name="arma_tu_plato_title">ARMA TU PLATO</string>
+    <string name="arma_tu_plato_ready">¡LISTO!</string>
+    <string name="cd_background">Fondo</string>
+
+    <string name="cd_food_on_plate">Alimento en el plato</string>
+    <string name="cd_food_broccoli">Brócoli</string>
+    <string name="cd_food_meat">Proteína</string>
+    <string name="cd_food_apple">Manzana</string>
+    <string name="cd_food_cheese">Queso</string>
+    <!-- Arma tu plato -->
+    <string name="arma_title">ARMA TU PLATO</string>
+    <string name="arma_ready">¡LISTO!</string>
+
+    <!-- A11y / contentDescription -->
+    <string name="cd_bg_arma">Fondo de cielo y pasto</string>
+    <string name="cd_nutri">Nutri saludando</string>
+    <string name="cd_plate">Plato vacío</string>
+    <string name="cd_slot">Lugar para alimento</string>
+    <!-- res/values/strings.xml -->
+
+        <!-- Título del cartel -->
+        <string name="guess_title">¡ADIVINA LA VERDURA!</string>
+
+        <!-- Descripciones de accesibilidad -->
+    <string name="cd_character">Nutri pensando</string>
+    <string name="loading_label">CARGANDO</string>
+    <string name="cd_logo_app">Logo Aventuras con Nutri</string>
+
+    <!-- Indicadores de nivel -->
+    <string name="level_indicator">Nivel %1$d de %2$d</string>
+
+    <!-- Títulos y descripciones de niveles -->
+    <string name="level1_title">Verduras</string>
+    <string name="level1_description">Aprende sobre verduras y sus beneficios</string>
+
+    <string name="level2_title">Frutas</string>
+    <string name="level2_description">Descubre el mundo de las frutas</string>
+
+    <string name="level3_title">Proteínas</string>
+    <string name="level3_description">Conoce las proteínas saludables</string>
+
+    <string name="level4_title">Granos</string>
+    <string name="level4_description">Explora los granos y cereales</string>
+
+    <string name="level5_title">Lácteos</string>
+    <string name="level5_description">Aprende sobre productos lácteos</string>
+</resources>
