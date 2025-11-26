@@ -66,7 +66,6 @@ class ClassificationGameState {
     var selectedFoods = mutableStateListOf<Food>()
 }
 
-// Lista completa de alimentos con sus categorías correctas
 val foodList = listOf(
     // DIARIO - Frutas y verduras frescas (consumo diario)
     Food(R.drawable.food_apple, "Manzana", BasketType.DAILY),
@@ -83,13 +82,14 @@ val foodList = listOf(
 
 
 
-    // A VECES - Proteínas y granos (consumo moderado)
+    // A VECES - (consumo moderado)
     Food(R.drawable.food_cheese, "Queso", BasketType.SOMETIMES),
-    Food(R.drawable.food_chicken, "Pollo", BasketType.SOMETIMES),
     Food(R.drawable.food_meat, "Carne", BasketType.SOMETIMES),
     Food(R.drawable.food_meatballs, "Albóndigas", BasketType.SOMETIMES),
     Food(R.drawable.food_corn, "Maíz", BasketType.SOMETIMES),
     Food(R.drawable.food_rawmeat, "Filete de Carne", BasketType.SOMETIMES),
+    Food(R.drawable.origenanimal5, "Salchicha", BasketType.SOMETIMES),
+
 
 
     // OCASIONAL - Alimentos procesados y dulces (consumo limitado)
@@ -97,7 +97,9 @@ val foodList = listOf(
     Food(R.drawable.food_chocolate, "Chocolate", BasketType.RARE),
     Food(R.drawable.food_cookie, "Galleta", BasketType.RARE),
     Food(R.drawable.food_frenchfries, "Papas fritas", BasketType.RARE),
-    Food(R.drawable.food_soda, "Refresco", BasketType.RARE)
+    Food(R.drawable.food_soda, "Refresco", BasketType.RARE),
+    Food(R.drawable.postre4, "Arroz con leche", BasketType.RARE)
+
 )
 
 @Composable

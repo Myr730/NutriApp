@@ -10,14 +10,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bamx.puebla.R
@@ -91,7 +95,7 @@ private val verdurasFeedback = mapOf(
     "verduras2" to "La calabaza es ligera y nutritiva.",
     "verduras3" to "La cebolla aporta sabor y antioxidantes.",
     "verduras4" to "El pimiento rojo aporta mucha vitamina C.",
-    "verduras5" to "El brócoli es excelente: fibra, vitaminas y minerales.",
+    "verduras5" to "El brócoli es excelente: fibra, vitamins y minerales.",
     "verduras6" to "El tomate es fresco y ligero.",
     "verduras7" to "El jalapeño da sabor, pero recuerda agregar más verduras.",
     "verduras8" to "La lechuga es fresca, pero ligera; combínala con más verduras.",
@@ -117,7 +121,6 @@ fun PlatoScreen(
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val audioManager = remember { PlatoAudioManager(context) }
 
     // Estados principales
@@ -147,9 +150,11 @@ fun PlatoScreen(
     // Estados de visualización
     var isShowingBebidas by remember { mutableStateOf(false) }
     var isShowingPostres by remember { mutableStateOf(false) }
-    var bebidaElegida by remember { mutableStateOf<FoodItem?>(null) }
-    var postreElegido by remember { mutableStateOf<FoodItem?>(null) }
     var detallesPorAlimento by remember { mutableStateOf("") }
+
+    // Área del plato y basura para el arrastre
+    var platoBounds by remember { mutableStateOf<Rect?>(null) }
+    var basuraBounds by remember { mutableStateOf<Rect?>(null) }
 
     // Función para obtener imagen de alimento
     fun getFoodImageResource(category: FoodCategory, index: Int): Int {
@@ -217,7 +222,7 @@ fun PlatoScreen(
                 else -> R.drawable.bebida1
             }
             FoodCategory.POSTRES -> when (index) {
-                1 -> R.drawable.postre1
+                1 -> R.drawable.food_cookie
                 2 -> R.drawable.postre2
                 3 -> R.drawable.postre3
                 4 -> R.drawable.postre4
@@ -239,7 +244,6 @@ fun PlatoScreen(
         }
     }
 
-    // MOVER ESTAS FUNCIONES ANTES DE computeFinalResults
     // Función para contar categorías en el plato
     fun countCategoriesInPlato(): Map<FoodCategory, Int> {
         val counts = mutableMapOf<FoodCategory, Int>()
@@ -287,25 +291,11 @@ fun PlatoScreen(
         return feedback
     }
 
-    // FUNCIÓN computeFinalResults DEFINIDA DESPUÉS DE LAS FUNCIONES QUE USA
+    // FUNCIÓN computeFinalResults
     fun computeFinalResults() {
         detallesPorAlimento = "Detalles de tus alimentos:\n\n"
         droppedItems.forEach { item ->
             detallesPorAlimento += "• ${item.feedback}\n\n"
-        }
-
-        // Evaluar bebida
-        bebidaElegida?.let { bebida ->
-            if (bebida.name != "bebida1") {
-                detallesPorAlimento += "• Elegiste una bebida azucarada. Procura elegir agua natural para evitar exceso de azúcar.\n\n"
-            }
-        }
-
-        // Evaluar postre
-        postreElegido?.let { postre ->
-            if (postre.name != "postre1") {
-                detallesPorAlimento += "• El postre está bien de vez en cuando; recuerda comer porciones pequeñas.\n\n"
-            }
         }
 
         // Evaluar proporciones del plato
@@ -316,7 +306,6 @@ fun PlatoScreen(
         }
     }
 
-    // El resto de las funciones permanecen igual...
     // Función para mostrar categoría
     fun showCategory(category: FoodCategory) {
         currentCategory = category
@@ -343,23 +332,6 @@ fun PlatoScreen(
             }
             val newIndex = if (currentIndex >= maxItems) 1 else currentIndex + 1
             indexes[category] = newIndex
-
-            // Actualizar bebida o postre elegido si corresponde
-            if (category == FoodCategory.BEBIDAS) {
-                bebidaElegida = FoodItem(
-                    category = category,
-                    name = "bebida$newIndex",
-                    imageRes = getFoodImageResource(category, newIndex),
-                    feedback = ""
-                )
-            } else if (category == FoodCategory.POSTRES) {
-                postreElegido = FoodItem(
-                    category = category,
-                    name = "postre$newIndex",
-                    imageRes = getFoodImageResource(category, newIndex),
-                    feedback = ""
-                )
-            }
         }
     }
 
@@ -375,28 +347,14 @@ fun PlatoScreen(
             }
             val newIndex = if (currentIndex <= 1) maxItems else currentIndex - 1
             indexes[category] = newIndex
-
-            // Actualizar bebida o postre elegido si corresponde
-            if (category == FoodCategory.BEBIDAS) {
-                bebidaElegida = FoodItem(
-                    category = category,
-                    name = "bebida$newIndex",
-                    imageRes = getFoodImageResource(category, newIndex),
-                    feedback = ""
-                )
-            } else if (category == FoodCategory.POSTRES) {
-                postreElegido = FoodItem(
-                    category = category,
-                    name = "postre$newIndex",
-                    imageRes = getFoodImageResource(category, newIndex),
-                    feedback = ""
-                )
-            }
         }
     }
 
-    // Función para manejar arrastre
+    // Función para manejar arrastre - SIMPLIFICADA
     fun handleDragStart(item: FoodItem, startPosition: Offset) {
+        // Solo permitir un arrastre a la vez
+        if (draggedItem != null) return
+
         draggedItem = item
         dragOffset = startPosition
         audioManager.playButtonSound()
@@ -411,13 +369,29 @@ fun PlatoScreen(
 
     fun handleDragEnd() {
         draggedItem?.let { item ->
-            // Verificar si se soltó en el plato (no en la basura)
-            // Por simplicidad, siempre agregamos al plato
-            val newItem = item.copy(
-                id = UUID.randomUUID().toString(),
-                offset = dragOffset
-            )
-            droppedItems.add(newItem)
+            // Verificar si se soltó sobre la basura
+            val isOnTrash = basuraBounds?.contains(dragOffset) ?: false
+
+            if (!isOnTrash) {
+                // Si no está en la basura, agregar al plato
+                val adjustedOffset = if (platoBounds?.contains(dragOffset) == true) {
+                    // Si está dentro del plato, ajustar la posición
+                    Offset(
+                        x = dragOffset.x - 40f,
+                        y = dragOffset.y - 40f
+                    )
+                } else {
+                    // Si está fuera del plato, usar la posición exacta
+                    dragOffset
+                }
+
+                val newItem = item.copy(
+                    id = UUID.randomUUID().toString(),
+                    offset = adjustedOffset
+                )
+                droppedItems.add(newItem)
+            }
+            // Si está en la basura, no hacer nada
         }
 
         draggedItem = null
@@ -436,8 +410,6 @@ fun PlatoScreen(
         audioManager.playButtonSound()
         interactionLocked = true
         showFinalResults = true
-
-        // Calcular resultados finales - AHORA ESTÁ DEFINIDA DESPUÉS DE LAS FUNCIONES QUE USA
         computeFinalResults()
     }
 
@@ -446,6 +418,7 @@ fun PlatoScreen(
         if (interactionLocked) return
         audioManager.playButtonSound()
         isShowingBebidas = true
+        isShowingPostres = false
         currentCategory = FoodCategory.BEBIDAS
     }
 
@@ -454,6 +427,7 @@ fun PlatoScreen(
         if (interactionLocked) return
         audioManager.playButtonSound()
         isShowingPostres = true
+        isShowingBebidas = false
         currentCategory = FoodCategory.POSTRES
     }
 
@@ -492,7 +466,7 @@ fun PlatoScreen(
                 detallesPorAlimento = detallesPorAlimento,
                 onBackClick = onBackClick
             )
-            else -> PlayingStateUI(
+            else -> MainGameUI(
                 onBackClick = onBackClick,
                 currentCategory = currentCategory,
                 instruccionesIndex = instruccionesIndex,
@@ -502,8 +476,6 @@ fun PlatoScreen(
                 droppedItems = droppedItems,
                 draggedItem = draggedItem,
                 dragOffset = dragOffset,
-                bebidaElegida = bebidaElegida,
-                postreElegido = postreElegido,
                 isShowingBebidas = isShowingBebidas,
                 isShowingPostres = isShowingPostres,
                 onCategoryClick = ::showCategory,
@@ -518,16 +490,16 @@ fun PlatoScreen(
                 onDrag = ::handleDrag,
                 onDragEnd = ::handleDragEnd,
                 getFoodImageResource = ::getFoodImageResource,
-                getFoodFeedback = ::getFoodFeedback
+                getFoodFeedback = ::getFoodFeedback,
+                onPlatoBoundsUpdate = { bounds -> platoBounds = bounds },
+                onBasuraBoundsUpdate = { bounds -> basuraBounds = bounds }
             )
         }
     }
 }
 
-// El resto del código permanece igual (los composables UI)...
-
 @Composable
-private fun PlayingStateUI(
+private fun MainGameUI(
     onBackClick: () -> Unit,
     currentCategory: FoodCategory?,
     instruccionesIndex: Int,
@@ -537,8 +509,6 @@ private fun PlayingStateUI(
     droppedItems: List<FoodItem>,
     draggedItem: FoodItem?,
     dragOffset: Offset,
-    bebidaElegida: FoodItem?,
-    postreElegido: FoodItem?,
     isShowingBebidas: Boolean,
     isShowingPostres: Boolean,
     onCategoryClick: (FoodCategory) -> Unit,
@@ -553,29 +523,33 @@ private fun PlayingStateUI(
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
     getFoodImageResource: (FoodCategory, Int) -> Int,
-    getFoodFeedback: (FoodCategory, Int) -> String
+    getFoodFeedback: (FoodCategory, Int) -> String,
+    onPlatoBoundsUpdate: (Rect?) -> Unit,
+    onBasuraBoundsUpdate: (Rect?) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Botón de volver - POSICIONADO CON offset
+        // Botón de volver
         Image(
             painter = painterResource(id = R.drawable.ic_back2),
             contentDescription = "Volver",
             modifier = Modifier
+                .align(Alignment.TopStart)
                 .offset(x = 16.dp, y = 16.dp)
                 .size(52.dp)
                 .clickable { onBackClick() }
         )
 
-        // Label "Arma tu plato" - POSICIONADO CON offset
+        // Label "Arma tu plato"
         Image(
             painter = painterResource(id = R.drawable.armaplato),
             contentDescription = "Arma tu plato",
             modifier = Modifier
-                .offset(x = (90).dp, y = 56.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = (-16).dp, y = 16.dp)
                 .size(250.dp, 80.dp)
         )
 
-        // Instrucciones - POSICIONADO CON offset
+        // Instrucciones
         Image(
             painter = painterResource(
                 id = when (instruccionesIndex) {
@@ -587,53 +561,42 @@ private fun PlayingStateUI(
             ),
             contentDescription = "Instrucciones",
             modifier = Modifier
-                .offset(x = 0.dp, y = (-100).dp)
+                .align(Alignment.TopEnd)
+                .offset(x = (-16).dp, y = 100.dp)
                 .size(250.dp, 150.dp)
         )
 
-        // Plato principal - CENTRADO CON Box
-        Box(
-            modifier = Modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.plato),
-                contentDescription = "Plato",
-                modifier = Modifier
-                    .size(350.dp, 200.dp)
-                    .offset(x = (30).dp, y = 400.dp)
+        // Plato principal
+        Image(
+            painter = painterResource(id = R.drawable.plato),
+            contentDescription = "Plato",
+            modifier = Modifier
+                .align(Alignment.Center)
+                .offset(y = (50).dp)
+                .size(350.dp, 200.dp)
+                .onGloballyPositioned { coordinates ->
+                    onPlatoBoundsUpdate(coordinates.boundsInWindow())
+                }
+        )
 
-            )
-        }
-
-        // Bandeja inferior
-        TrayAreaUI(
-            currentCategory = currentCategory,
-            bebidasAndPostresUnlocked = bebidasAndPostresUnlocked,
-            interactionLocked = interactionLocked,
-            indexes = indexes,
-            isShowingBebidas = isShowingBebidas,
-            isShowingPostres = isShowingPostres,
-            onCategoryClick = onCategoryClick,
-            onCloseCategory = onCloseCategory,
-            onNextItem = onNextItem,
-            onPreviousItem = onPreviousItem,
-            onSiguienteClick = onSiguienteClick,
-            onListoClick = onListoClick,
-            onBebidasClick = onBebidasClick,
-            onPostresClick = onPostresClick,
-            onDragStart = onDragStart,
-            onDrag = onDrag,
-            onDragEnd = onDragEnd,
-            getFoodImageResource = getFoodImageResource,
-            getFoodFeedback = getFoodFeedback
+        // Basura
+        Image(
+            painter = painterResource(id = R.drawable.basura),
+            contentDescription = "Basura",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = (-50).dp, y = 250.dp)
+                .size(110.dp, 140.dp)
+                .onGloballyPositioned { coordinates ->
+                    onBasuraBoundsUpdate(coordinates.boundsInWindow())
+                }
         )
 
         // Items en el plato
         droppedItems.forEach { item ->
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(120.dp)
                     .graphicsLayer {
                         translationX = item.offset.x
                         translationY = item.offset.y
@@ -652,10 +615,10 @@ private fun PlayingStateUI(
         draggedItem?.let { item ->
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(120.dp)
                     .graphicsLayer {
-                        translationX = dragOffset.x - 40f
-                        translationY = dragOffset.y - 40f
+                        translationX = dragOffset.x
+                        translationY = dragOffset.y
                     }
             ) {
                 Image(
@@ -673,238 +636,89 @@ private fun PlayingStateUI(
             }
         }
 
-        // Basura - POSICIONADO CON offset
-        Image(
-            painter = painterResource(id = R.drawable.basura),
-            contentDescription = "Basura",
+        // BANDEJA INFERIOR
+        Box(
             modifier = Modifier
-                .offset(x = (200).dp, y = 300.dp)
-                .size(250.dp, 120.dp)
-        )
-
-        // Mostrar bebida y postre elegidos si están disponibles
-        bebidaElegida?.let { bebida ->
+                .fillMaxWidth()
+                .height(280.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            // Manta como fondo
             Image(
-                painter = painterResource(id = bebida.imageRes),
-                contentDescription = "Bebida elegida",
+                painter = painterResource(id = R.drawable.blanket),
+                contentDescription = "Manta",
                 modifier = Modifier
-                    .offset(x = 125.dp, y = (-105).dp)
-                    .size(100.dp, 100.dp)
+                    .fillMaxSize()
+                    .offset(y = (-50).dp)
+                    .align(Alignment.BottomCenter)
             )
-        }
-
-        postreElegido?.let { postre ->
             Image(
-                painter = painterResource(id = postre.imageRes),
-                contentDescription = "Postre elegido",
+                painter = painterResource(id = R.drawable.blanket),
+                contentDescription = "Manta",
                 modifier = Modifier
-                    .offset(x = (-141).dp, y = (-85).dp)
-                    .size(90.dp, 90.dp)
+                    .fillMaxSize()
+                    .offset(y = (28).dp)
+                    .align(Alignment.BottomCenter)
             )
-        }
-    }
-}
 
-@Composable
-private fun TrayAreaUI(
-    currentCategory: FoodCategory?,
-    bebidasAndPostresUnlocked: Boolean,
-    interactionLocked: Boolean,
-    indexes: Map<FoodCategory, Int>,
-    isShowingBebidas: Boolean,
-    isShowingPostres: Boolean,
-    onCategoryClick: (FoodCategory) -> Unit,
-    onCloseCategory: () -> Unit,
-    onNextItem: () -> Unit,
-    onPreviousItem: () -> Unit,
-    onSiguienteClick: () -> Unit,
-    onListoClick: () -> Unit,
-    onBebidasClick: () -> Unit,
-    onPostresClick: () -> Unit,
-    onDragStart: (FoodItem, Offset) -> Unit,
-    onDrag: (Offset) -> Unit,
-    onDragEnd: () -> Unit,
-    getFoodImageResource: (FoodCategory, Int) -> Int,
-    getFoodFeedback: (FoodCategory, Int) -> String
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp)
-            .offset(y = 250.dp) // POSICIONADO EN LA PARTE INFERIOR
-    ) {
-        // Manta
-        Image(
-            painter = painterResource(id = R.drawable.blanket),
-            contentDescription = "Manta",
-            modifier = Modifier
-                .offset(x = (5).dp, y = 320.dp)
-                .size(1500.dp, 3000.dp)
+            // CONTENIDO DE LA BANDEJA
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 20.dp)
+            ) {
+                when {
+                    // Si hay una categoría seleccionada, mostrar la interfaz de selección
+                    currentCategory != null -> {
+                        CategorySelectionUI(
+                            currentCategory = currentCategory!!,
+                            index = indexes[currentCategory] ?: 1,
+                            isShowingBebidas = isShowingBebidas,
+                            isShowingPostres = isShowingPostres,
+                            onCloseCategory = onCloseCategory,
+                            onNextItem = onNextItem,
+                            onPreviousItem = onPreviousItem,
+                            onDragStart = onDragStart,
+                            onDrag = onDrag,
+                            onDragEnd = onDragEnd,
+                            getFoodImageResource = getFoodImageResource,
+                            getFoodFeedback = getFoodFeedback
+                        )
+                    }
+                    // Si no hay categoría seleccionada pero están desbloqueadas bebidas/postres
+                    bebidasAndPostresUnlocked -> {
+                        BebidasPostresUI(
+                            onBebidasClick = onBebidasClick,
+                            onPostresClick = onPostresClick,
+                            onListoClick = onListoClick
+                        )
+                    }
+                    // Estado inicial - mostrar categorías principales
+                    else -> {
+                        FoodCategoriesGrid(onCategoryClick = onCategoryClick)
+                    }
+                }
 
-        )
-        Image(
-            painter = painterResource(id = R.drawable.blanket),
-            contentDescription = "Manta",
-            modifier = Modifier
-                .offset(x = (5).dp, y = 400.dp)
-                .size(1500.dp, 3000.dp)
-
-        )
-
-        when {
-            // Mostrar categorías principales
-            currentCategory == null && !bebidasAndPostresUnlocked -> {
-                FoodCategoriesGrid(onCategoryClick = onCategoryClick)
-            }
-
-            // Mostrar bebidas/postres desbloqueados
-            bebidasAndPostresUnlocked && currentCategory == null -> {
-                BebidasPostresUI(
-                    onBebidasClick = onBebidasClick,
-                    onPostresClick = onPostresClick,
-                    onListoClick = onListoClick
-                )
-            }
-
-            // Mostrar categoría seleccionada
-            else -> {
-                CurrentCategoryUI(
-                    currentCategory = currentCategory,
-                    index = indexes[currentCategory] ?: 1,
-                    isShowingBebidas = isShowingBebidas,
-                    isShowingPostres = isShowingPostres,
-                    onCloseCategory = onCloseCategory,
-                    onNextItem = onNextItem,
-                    onPreviousItem = onPreviousItem,
-                    onDragStart = onDragStart,
-                    onDrag = onDrag,
-                    onDragEnd = onDragEnd,
-                    getFoodImageResource = getFoodImageResource,
-                    getFoodFeedback = getFoodFeedback
-                )
+                // Botón siguiente (solo en estado inicial)
+                if (!bebidasAndPostresUnlocked && currentCategory == null) {
+                    Image(
+                        painter = painterResource(id = R.drawable.siguiente),
+                        contentDescription = "Siguiente",
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .offset(x = 1.dp, y = (-200).dp)
+                            .size(200.dp, 70.dp)
+                            .clickable { onSiguienteClick() }
+                    )
+                }
             }
         }
-
-        // Botón siguiente (cuando no está desbloqueado)
-        if (!bebidasAndPostresUnlocked) {
-            Image(
-                painter = painterResource(id = R.drawable.siguiente),
-                contentDescription = "Siguiente",
-                modifier = Modifier
-                    .offset(x = -10.dp, y = (350).dp)
-                    .size(200.dp, 70.dp)
-                    .clickable { onSiguienteClick() }
-            )
-        }
     }
 }
 
 @Composable
-private fun FoodCategoriesGrid(onCategoryClick: (FoodCategory) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        // Fila 1: Carbohidratos y Frutas
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            FoodCategoryButton(
-                category = FoodCategory.CARBOHIDRATOS,
-                imageRes = R.drawable.carbohidratos,
-                onClick = onCategoryClick
-            )
-            FoodCategoryButton(
-                category = FoodCategory.FRUTAS,
-                imageRes = R.drawable.frutas,
-                onClick = onCategoryClick
-            )
-        }
-
-        // Fila 2: Origen Animal y Verduras
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            FoodCategoryButton(
-                category = FoodCategory.ORIGEN_ANIMAL,
-                imageRes = R.drawable.origenanimal,
-                onClick = onCategoryClick
-            )
-            FoodCategoryButton(
-                category = FoodCategory.VERDURAS,
-                imageRes = R.drawable.verduras,
-                onClick = onCategoryClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun FoodCategoryButton(
-    category: FoodCategory,
-    imageRes: Int,
-    onClick: (FoodCategory) -> Unit
-) {
-    Image(
-        painter = painterResource(id = imageRes),
-        contentDescription = category.name,
-        modifier = Modifier
-            .size(140.dp)
-            .offset(x = (-5).dp, y = 350.dp)
-            .clickable { onClick(category) }
-    )
-}
-
-@Composable
-private fun BebidasPostresUI(
-    onBebidasClick: () -> Unit,
-    onPostresClick: () -> Unit,
-    onListoClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bebidas),
-                contentDescription = "Bebidas",
-                modifier = Modifier
-                    .size(120.dp, 80.dp)
-                    .clickable { onBebidasClick() }
-            )
-            Image(
-                painter = painterResource(id = R.drawable.postres),
-                contentDescription = "Postres",
-                modifier = Modifier
-                    .size(120.dp, 80.dp)
-                    .clickable { onPostresClick() }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Image(
-            painter = painterResource(id = R.drawable.listo),
-            contentDescription = "Listo",
-            modifier = Modifier
-                .size(120.dp, 40.dp)
-                .clickable { onListoClick() }
-        )
-    }
-}
-
-@Composable
-private fun CurrentCategoryUI(
-    currentCategory: FoodCategory?,
+private fun CategorySelectionUI(
+    currentCategory: FoodCategory,
     index: Int,
     isShowingBebidas: Boolean,
     isShowingPostres: Boolean,
@@ -917,61 +731,204 @@ private fun CurrentCategoryUI(
     getFoodImageResource: (FoodCategory, Int) -> Int,
     getFoodFeedback: (FoodCategory, Int) -> String
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Plato pequeño
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+    ) {
+        // Plato pequeño centrado
         Image(
             painter = painterResource(id = R.drawable.platito),
             contentDescription = "Plato pequeño",
             modifier = Modifier
-                .size(200.dp, 120.dp)
+                .size(220.dp, 130.dp)
+                .align(Alignment.Center)
         )
 
-        // Imagen actual de la categoría
-        currentCategory?.let { category ->
-            val foodItem = FoodItem(
-                category = category,
-                name = "${category.name}$index",
-                imageRes = getFoodImageResource(category, index),
-                feedback = getFoodFeedback(category, index)
-            )
+        // Imagen actual de la categoría - MEJORADO para postres
+        val foodItem = FoodItem(
+            category = currentCategory,
+            name = "${currentCategory.name}$index",
+            imageRes = getFoodImageResource(currentCategory, index),
+            feedback = getFoodFeedback(currentCategory, index)
+        )
 
-            DraggableFoodItem(
-                foodItem = foodItem,
-                onDragStart = onDragStart,
-                onDrag = onDrag,
-                onDragEnd = onDragEnd,
-                modifier = Modifier.size(100.dp)
-            )
+        // AJUSTES MEJORADOS PARA CENTRADO
+        val imageSize = when (currentCategory) {
+            FoodCategory.BEBIDAS -> 150.dp
+            FoodCategory.POSTRES -> 140.dp
+            else -> 140.dp
         }
 
-        // Flechas de navegación - POSICIONADAS CON offset
+        // OFFSET VERTICAL
+        val verticalOffset = when (currentCategory) {
+            FoodCategory.BEBIDAS -> (-8).dp
+            FoodCategory.POSTRES -> (-25).dp
+            else -> (-10).dp
+        }
+
+        DraggableFoodItem(
+            foodItem = foodItem,
+            onDragStart = onDragStart,
+            onDrag = onDrag,
+            onDragEnd = onDragEnd,
+            modifier = Modifier
+                .size(imageSize)
+                .align(Alignment.Center)
+                .offset(y = verticalOffset)
+        )
+
+        // Flecha izquierda
         Image(
             painter = painterResource(id = R.drawable.arrowl),
             contentDescription = "Anterior",
             modifier = Modifier
-                .offset(x = 20.dp, y = 0.dp)
-                .size(50.dp)
+                .size(60.dp)
+                .align(Alignment.CenterStart)
+                .offset(x = (-15).dp)
                 .clickable { onPreviousItem() }
         )
 
+        // Flecha derecha
         Image(
             painter = painterResource(id = R.drawable.arrowr),
             contentDescription = "Siguiente",
             modifier = Modifier
-                .offset(x = (-20).dp, y = 0.dp)
-                .size(50.dp)
+                .size(60.dp)
+                .align(Alignment.CenterEnd)
+                .offset(x = 15.dp)
                 .clickable { onNextItem() }
         )
 
-        // Botón cerrar - POSICIONADO CON offset
+        // Botón cerrar
         Image(
             painter = painterResource(id = R.drawable.close),
             contentDescription = "Cerrar",
             modifier = Modifier
-                .offset(x = (-20).dp, y = (-20).dp)
-                .size(50.dp)
+                .size(45.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = (-10).dp, y = 10.dp)
                 .clickable { onCloseCategory() }
         )
+    }
+}
+
+@Composable
+private fun FoodCategoriesGrid(onCategoryClick: (FoodCategory) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Fila 1: Carbohidratos y Frutas (tamaño normal)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            FoodCategoryButton(
+                category = FoodCategory.CARBOHIDRATOS,
+                imageRes = R.drawable.carbohidratos,
+                size = 130.dp,
+                onClick = onCategoryClick
+            )
+            FoodCategoryButton(
+                category = FoodCategory.FRUTAS,
+                imageRes = R.drawable.frutas,
+                size = 130.dp,
+                onClick = onCategoryClick
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Fila 2: Origen Animal y Verduras
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            FoodCategoryButton(
+                category = FoodCategory.ORIGEN_ANIMAL,
+                imageRes = R.drawable.origenanimal,
+                size = 130.dp,
+                onClick = onCategoryClick
+            )
+            FoodCategoryButton(
+                category = FoodCategory.VERDURAS,
+                imageRes = R.drawable.verduras,
+                size = 130.dp,
+                onClick = onCategoryClick
+            )
+        }
+    }
+}
+
+// FoodCategoryButton modificado para aceptar tamaño personalizado
+@Composable
+private fun FoodCategoryButton(
+    category: FoodCategory,
+    imageRes: Int,
+    size: Dp = 150.dp, // Tamaño por defecto
+    onClick: (FoodCategory) -> Unit
+) {
+    Image(
+        painter = painterResource(id = imageRes),
+        contentDescription = category.name,
+        modifier = Modifier
+            .size(size)
+            .offset(y = (-10).dp)
+            .clickable { onClick(category) }
+    )
+}
+
+@Composable
+private fun BebidasPostresUI(
+    onBebidasClick: () -> Unit,
+    onPostresClick: () -> Unit,
+    onListoClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Botones de Bebidas y Postres
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bebidas),
+                    contentDescription = "Bebidas",
+                    modifier = Modifier
+                        .size(180.dp, 120.dp)
+                        .clickable { onBebidasClick() }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.postres),
+                    contentDescription = "Postres",
+                    modifier = Modifier
+                        .size(180.dp, 120.dp)
+                        .clickable { onPostresClick() }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Botón Listo
+            Image(
+                painter = painterResource(id = R.drawable.listo),
+                contentDescription = "Listo",
+                modifier = Modifier
+                    .size(100.dp, 35.dp)
+                    .clickable { onListoClick() }
+            )
+        }
     }
 }
 
@@ -990,8 +947,11 @@ private fun DraggableFoodItem(
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset ->
-                        isDragging = true
-                        onDragStart(foodItem, offset)
+                        // Solo permitir arrastre si no hay otro item siendo arrastrado
+                        if (!isDragging) {
+                            isDragging = true
+                            onDragStart(foodItem, offset)
+                        }
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
