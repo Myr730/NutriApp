@@ -783,7 +783,8 @@ private fun PlayingStateUI(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(start = 150.dp, bottom = 150.dp)
-                .size(120.dp, 35.dp)
+                .offset(x = (-93).dp, y = -88.dp)
+                .size(45.dp, 45.dp)
                 .clickable(enabled = blenderEnabled) { onBlenderClick() },
             contentScale = ContentScale.FillBounds,
             alpha = if (blenderEnabled) 1f else 0.5f
