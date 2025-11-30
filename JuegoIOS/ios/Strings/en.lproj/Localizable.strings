@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  Aventuras con Nutri
+
+  Created by Victoria García on 21/09/25.
+  
+ /* HOME */
+ "home_title" = "Aventuras con NUTRI";
+ "btn_play" = "JUGAR";
+ "btn_parents" = "PADRES";
+ "btn_settings" = "AJUSTES";
+
+ /* MEMORY / GAME */
+ "game_title_memory" = "¡Encuentra las parejas iguales!";
+ "panel_instructions_title" = "Instrucciones";
+ "panel_status_title" = "Estado";
+ "panel_points" = "Puntos";
+ "panel_time" = "Tiempo";
+
+ /* CLASIFICA ALIMENTOS */
+ "classify_title" = "Clasifica los alimentos";
+ "classify_fruits" = "Frutas";
+ "classify_veggies" = "Verduras";
+ "classify_occasional" = "Ocasional";
+
+ /* ARMA TU PLATO */
+ "plate_title" = "ARMA TU PLATO";
+ "plate_ready" = "¡LISTO!";
+
+ /* TIMER MOVIMIENTO */
+ "move_title" = "¡HORA DE MOVERSE!";
+ "move_subtitle" = "Llevas 30 minutos jugando, hagamos 60 seg de ejercicio";
+
+ /* PROGRESO / PADRES */
+ "parents_title" = "Mi Progreso";
+ "section_profile_title" = "Perfil";
+ "section_weight_title" = "Historial de Peso";
+ "profile_name_placeholder" = "María García Lopez";
+ "weight_header_date" = "Fecha";
+ "weight_header_value" = "Peso (kg)";
+
+/// PADRES - MENÚ
+"parents_section_title" = "PADRES";
+"parents_menu_progress" = "PROGRESO";
+"parents_menu_weight_height" = "PESO/TALLA";
+"parents_menu_tips" = "CONSEJOS Y RECETAS";
+"parents_menu_playtime" = "TIEMPO DE JUEGO";
+
+*/
